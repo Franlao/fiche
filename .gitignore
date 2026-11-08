@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+*.egg-info
+.venv
+
+# fiche
+.fiche_cache*/
+out/
+.env
+
+# couverture pytest
+.coverage
+htmlcov/
+
+# entrées du banc : textes de cours, regénérées par ingest
+eval/entrees/

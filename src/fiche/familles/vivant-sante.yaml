@@ -1,0 +1,54 @@
+id: vivant-sante
+version: 1
+nom: Vivant et santé
+filieres: [biologie, médecine, pharmacie, soins infirmiers, sciences de la vie]
+pour_etudiant: >
+  Les mécanismes en étapes numérotées, les classifications en tableaux, les chiffres et les
+  seuils à part, les arbres de décision quand le cours distingue des cas. Ce qu'il faut savoir
+  redire à l'oral à la fin de chaque partie.
+ton: >
+  Direct et concret. Les termes exacts du cours (nom de la molécule, de la structure, du
+  signe clinique), jamais de synonyme approximatif. Les quantités avec leur unité.
+blocs:
+  - type: etapes
+    usage: >
+      Tout mécanisme, voie, cascade, cycle ou protocole : une étape par ligne, dans l'ordre,
+      avec ce qui déclenche et ce qui résulte.
+  - type: tableau
+    usage: >
+      Classifications et comparaisons : types de transport, familles de récepteurs, signes
+      d'une pathologie, doses et seuils. Une ligne par élément, une colonne par critère.
+  - type: definition
+    usage: Chaque structure, molécule ou terme que la section introduit.
+  - type: encadre
+    usage: >
+      Les chiffres, seuils, lois et règles à connaître par cœur (gradient, potentiel, dose,
+      durée, pourcentage) : nature « loi », « regle » ou « principe ».
+  - type: decision
+    usage: >
+      Quand le cours distingue des cas ou des conduites : « si cette situation, alors cette
+      réponse ». Diagnostics différentiels, choix d'un transport selon le gradient, conduite à
+      tenir.
+  - type: piege
+    usage: >
+      Confusions entre deux éléments proches du cours (deux types de transport, deux
+      récepteurs, deux signes). Seulement si les deux sont dans les extraits.
+  - type: essentiel
+    usage: En fin de section, ce qu'il faut savoir redire à l'oral, en 3 à 6 lignes.
+  - type: autotest
+    usage: 2 ou 3 questions courtes dont la réponse est dans la section.
+  - type: texte
+    usage: Rare. Le rôle d'ensemble d'une structure, quand aucune autre forme ne convient.
+ordre: [texte, definition, etapes, tableau, encadre, decision, piege, essentiel, autotest]
+max_blocs_par_section: 8
+max_texte_par_section: 1
+plan: >
+  Fais voir la logique structure, fonction, régulation : quelles structures le cours décrit,
+  quels mécanismes elles permettent, ce qui les régule ou les dérègle. Pour chaque section, dis
+  quel mécanisme va en étapes, quelle classification va en tableau, quels chiffres vont en
+  encadré. Le fil conducteur relie les mécanismes entre eux (ce qui en amont déclenche quoi).
+redaction: >
+  Chaque étape d'un mécanisme nomme l'acteur et l'effet. Les tableaux ont des cellules courtes.
+  Les quantités gardent l'unité et la valeur du cours. Préfère des étapes à un texte, un tableau
+  à une énumération. Les réponses de l'autotest se trouvent dans les extraits. N'ajoute aucune
+  connaissance médicale extérieure au cours.

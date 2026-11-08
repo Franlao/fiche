@@ -1,0 +1,969 @@
+{
+  "$defs": {
+    "AutotestBloc": {
+      "properties": {
+        "type": {
+          "const": "autotest",
+          "title": "Type",
+          "type": "string"
+        },
+        "titre": {
+          "title": "Titre",
+          "type": "string"
+        },
+        "questions": {
+          "description": "2 à 4 questions",
+          "items": {
+            "$ref": "#/$defs/QuestionReponse"
+          },
+          "title": "Questions",
+          "type": "array"
+        },
+        "passages": {
+          "description": "Numéros des extraits qui justifient le bloc, tels que donnés entre crochets",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Passages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "titre",
+        "questions",
+        "passages"
+      ],
+      "title": "AutotestBloc",
+      "type": "object"
+    },
+    "BlocFiche": {
+      "properties": {
+        "bloc": {
+          "discriminator": {
+            "mapping": {
+              "autotest": "#/$defs/AutotestBloc",
+              "decision": "#/$defs/DecisionBloc",
+              "definition": "#/$defs/DefinitionBloc",
+              "encadre": "#/$defs/EncadreBloc",
+              "essentiel": "#/$defs/EssentielBloc",
+              "etapes": "#/$defs/EtapesBloc",
+              "exemple": "#/$defs/ExempleBloc",
+              "frise": "#/$defs/FriseBloc",
+              "piege": "#/$defs/PiegeBloc",
+              "tableau": "#/$defs/TableauBloc",
+              "texte": "#/$defs/TexteBloc"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/TexteBloc"
+            },
+            {
+              "$ref": "#/$defs/DefinitionBloc"
+            },
+            {
+              "$ref": "#/$defs/EncadreBloc"
+            },
+            {
+              "$ref": "#/$defs/TableauBloc"
+            },
+            {
+              "$ref": "#/$defs/EtapesBloc"
+            },
+            {
+              "$ref": "#/$defs/FriseBloc"
+            },
+            {
+              "$ref": "#/$defs/DecisionBloc"
+            },
+            {
+              "$ref": "#/$defs/ExempleBloc"
+            },
+            {
+              "$ref": "#/$defs/PiegeBloc"
+            },
+            {
+              "$ref": "#/$defs/EssentielBloc"
+            },
+            {
+              "$ref": "#/$defs/AutotestBloc"
+            }
+          ],
+          "title": "Bloc"
+        },
+        "passage_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Passage Ids",
+          "type": "array"
+        },
+        "pages": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Pages",
+          "type": "array"
+        },
+        "verifie": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Vrai : soutenu par ses passages ; None : non vérifié",
+          "title": "Verifie"
+        }
+      },
+      "required": [
+        "bloc"
+      ],
+      "title": "BlocFiche",
+      "type": "object"
+    },
+    "Cas": {
+      "properties": {
+        "si": {
+          "description": "La condition ou la situation",
+          "title": "Si",
+          "type": "string"
+        },
+        "alors": {
+          "description": "Ce qui en découle selon le cours",
+          "title": "Alors",
+          "type": "string"
+        }
+      },
+      "required": [
+        "si",
+        "alors"
+      ],
+      "title": "Cas",
+      "type": "object"
+    },
+    "ChapitreFiche": {
+      "properties": {
+        "section_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Section Id"
+        },
+        "titre": {
+          "default": "",
+          "title": "Titre",
+          "type": "string"
+        },
+        "sections": {
+          "items": {
+            "$ref": "#/$defs/SectionFiche"
+          },
+          "title": "Sections",
+          "type": "array"
+        }
+      },
+      "required": [
+        "sections"
+      ],
+      "title": "ChapitreFiche",
+      "type": "object"
+    },
+    "Couverture": {
+      "description": "Les notions essentielles du cours (importance 3) et celles que la fiche nomme.",
+      "properties": {
+        "essentielles": {
+          "default": 0,
+          "title": "Essentielles",
+          "type": "integer"
+        },
+        "couvertes": {
+          "default": 0,
+          "title": "Couvertes",
+          "type": "integer"
+        },
+        "manquantes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Manquantes",
+          "type": "array"
+        }
+      },
+      "title": "Couverture",
+      "type": "object"
+    },
+    "DecisionBloc": {
+      "description": "Quand le cours distingue des cas : « si …, alors … ».",
+      "properties": {
+        "type": {
+          "const": "decision",
+          "title": "Type",
+          "type": "string"
+        },
+        "titre": {
+          "title": "Titre",
+          "type": "string"
+        },
+        "situation": {
+          "description": "La question ou la situation de départ",
+          "title": "Situation",
+          "type": "string"
+        },
+        "cas": {
+          "description": "2 à 6 cas",
+          "items": {
+            "$ref": "#/$defs/Cas"
+          },
+          "title": "Cas",
+          "type": "array"
+        },
+        "passages": {
+          "description": "Numéros des extraits qui justifient le bloc, tels que donnés entre crochets",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Passages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "titre",
+        "situation",
+        "cas",
+        "passages"
+      ],
+      "title": "DecisionBloc",
+      "type": "object"
+    },
+    "DefinitionBloc": {
+      "properties": {
+        "type": {
+          "const": "definition",
+          "title": "Type",
+          "type": "string"
+        },
+        "titre": {
+          "description": "Le terme défini, avec la notation du cours",
+          "title": "Titre",
+          "type": "string"
+        },
+        "definition": {
+          "description": "La définition, 1 à 3 phrases, mots du cours",
+          "title": "Definition",
+          "type": "string"
+        },
+        "exemple": {
+          "description": "Un exemple donné par le cours, ou vide",
+          "title": "Exemple",
+          "type": "string"
+        },
+        "passages": {
+          "description": "Numéros des extraits qui justifient le bloc, tels que donnés entre crochets",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Passages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "titre",
+        "definition",
+        "exemple",
+        "passages"
+      ],
+      "title": "DefinitionBloc",
+      "type": "object"
+    },
+    "EncadreBloc": {
+      "description": "Ce qu'il faut savoir par cœur : théorème, propriété, formule, règle, loi, principe.",
+      "properties": {
+        "type": {
+          "const": "encadre",
+          "title": "Type",
+          "type": "string"
+        },
+        "nature": {
+          "enum": [
+            "theoreme",
+            "propriete",
+            "formule",
+            "regle",
+            "loi",
+            "principe"
+          ],
+          "title": "Nature",
+          "type": "string"
+        },
+        "titre": {
+          "description": "Nom du résultat tel que le cours le nomme",
+          "title": "Titre",
+          "type": "string"
+        },
+        "enonce": {
+          "description": "L'énoncé exact ; formules en LaTeX entre $ $",
+          "title": "Enonce",
+          "type": "string"
+        },
+        "conditions": {
+          "description": "Hypothèses ou conditions de validité, ou liste vide",
+          "items": {
+            "type": "string"
+          },
+          "title": "Conditions",
+          "type": "array"
+        },
+        "variables": {
+          "description": "Sens de chaque symbole de la formule, ou vide",
+          "items": {
+            "$ref": "#/$defs/Variable"
+          },
+          "title": "Variables",
+          "type": "array"
+        },
+        "idee": {
+          "description": "Pourquoi c'est vrai, ou à quoi ça sert, si le cours le dit ; sinon vide",
+          "title": "Idee",
+          "type": "string"
+        },
+        "passages": {
+          "description": "Numéros des extraits qui justifient le bloc, tels que donnés entre crochets",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Passages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "nature",
+        "titre",
+        "enonce",
+        "conditions",
+        "variables",
+        "idee",
+        "passages"
+      ],
+      "title": "EncadreBloc",
+      "type": "object"
+    },
+    "EssentielBloc": {
+      "description": "Ce qu'il faut retenir de la section, en quelques lignes.",
+      "properties": {
+        "type": {
+          "const": "essentiel",
+          "title": "Type",
+          "type": "string"
+        },
+        "titre": {
+          "title": "Titre",
+          "type": "string"
+        },
+        "points": {
+          "description": "3 à 8 lignes, une idée par ligne",
+          "items": {
+            "type": "string"
+          },
+          "title": "Points",
+          "type": "array"
+        },
+        "passages": {
+          "description": "Numéros des extraits qui justifient le bloc, tels que donnés entre crochets",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Passages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "titre",
+        "points",
+        "passages"
+      ],
+      "title": "EssentielBloc",
+      "type": "object"
+    },
+    "Etape": {
+      "properties": {
+        "titre": {
+          "description": "3 à 8 mots",
+          "title": "Titre",
+          "type": "string"
+        },
+        "detail": {
+          "description": "1 ou 2 phrases",
+          "title": "Detail",
+          "type": "string"
+        }
+      },
+      "required": [
+        "titre",
+        "detail"
+      ],
+      "title": "Etape",
+      "type": "object"
+    },
+    "EtapesBloc": {
+      "description": "Un processus, un mécanisme, une méthode : dans l'ordre.",
+      "properties": {
+        "type": {
+          "const": "etapes",
+          "title": "Type",
+          "type": "string"
+        },
+        "titre": {
+          "title": "Titre",
+          "type": "string"
+        },
+        "etapes": {
+          "description": "2 à 8 étapes ordonnées",
+          "items": {
+            "$ref": "#/$defs/Etape"
+          },
+          "title": "Etapes",
+          "type": "array"
+        },
+        "passages": {
+          "description": "Numéros des extraits qui justifient le bloc, tels que donnés entre crochets",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Passages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "titre",
+        "etapes",
+        "passages"
+      ],
+      "title": "EtapesBloc",
+      "type": "object"
+    },
+    "Evenement": {
+      "properties": {
+        "repere": {
+          "description": "Date, période ou rang",
+          "title": "Repere",
+          "type": "string"
+        },
+        "evenement": {
+          "title": "Evenement",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repere",
+        "evenement"
+      ],
+      "title": "Evenement",
+      "type": "object"
+    },
+    "ExempleBloc": {
+      "description": "Un exemple ou un exercice résolu que le cours donne.",
+      "properties": {
+        "type": {
+          "const": "exemple",
+          "title": "Type",
+          "type": "string"
+        },
+        "titre": {
+          "title": "Titre",
+          "type": "string"
+        },
+        "enonce": {
+          "title": "Enonce",
+          "type": "string"
+        },
+        "resolution": {
+          "description": "Les étapes de la résolution, 1 à 6",
+          "items": {
+            "type": "string"
+          },
+          "title": "Resolution",
+          "type": "array"
+        },
+        "resultat": {
+          "description": "Ce qu'on retient de l'exemple",
+          "title": "Resultat",
+          "type": "string"
+        },
+        "passages": {
+          "description": "Numéros des extraits qui justifient le bloc, tels que donnés entre crochets",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Passages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "titre",
+        "enonce",
+        "resolution",
+        "resultat",
+        "passages"
+      ],
+      "title": "ExempleBloc",
+      "type": "object"
+    },
+    "FriseBloc": {
+      "properties": {
+        "type": {
+          "const": "frise",
+          "title": "Type",
+          "type": "string"
+        },
+        "titre": {
+          "title": "Titre",
+          "type": "string"
+        },
+        "evenements": {
+          "description": "3 à 10 repères ordonnés",
+          "items": {
+            "$ref": "#/$defs/Evenement"
+          },
+          "title": "Evenements",
+          "type": "array"
+        },
+        "passages": {
+          "description": "Numéros des extraits qui justifient le bloc, tels que donnés entre crochets",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Passages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "titre",
+        "evenements",
+        "passages"
+      ],
+      "title": "FriseBloc",
+      "type": "object"
+    },
+    "GabaritInfo": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        },
+        "nom": {
+          "title": "Nom",
+          "type": "string"
+        },
+        "suggere": {
+          "default": false,
+          "title": "Suggere",
+          "type": "boolean"
+        },
+        "raison": {
+          "default": "",
+          "title": "Raison",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "nom"
+      ],
+      "title": "GabaritInfo",
+      "type": "object"
+    },
+    "Piege": {
+      "properties": {
+        "erreur": {
+          "description": "L'erreur ou la confusion",
+          "title": "Erreur",
+          "type": "string"
+        },
+        "correction": {
+          "description": "Ce qui est juste, selon le cours",
+          "title": "Correction",
+          "type": "string"
+        }
+      },
+      "required": [
+        "erreur",
+        "correction"
+      ],
+      "title": "Piege",
+      "type": "object"
+    },
+    "PiegeBloc": {
+      "description": "Confusions entre des éléments du cours, ou erreurs que le cours signale lui-même.",
+      "properties": {
+        "type": {
+          "const": "piege",
+          "title": "Type",
+          "type": "string"
+        },
+        "titre": {
+          "title": "Titre",
+          "type": "string"
+        },
+        "pieges": {
+          "description": "1 à 5 pièges",
+          "items": {
+            "$ref": "#/$defs/Piege"
+          },
+          "title": "Pieges",
+          "type": "array"
+        },
+        "passages": {
+          "description": "Numéros des extraits qui justifient le bloc, tels que donnés entre crochets",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Passages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "titre",
+        "pieges",
+        "passages"
+      ],
+      "title": "PiegeBloc",
+      "type": "object"
+    },
+    "QuestionReponse": {
+      "properties": {
+        "question": {
+          "description": "Question précise qui appelle une réponse courte",
+          "title": "Question",
+          "type": "string"
+        },
+        "reponse": {
+          "description": "1 à 2 phrases, exactes selon le cours",
+          "title": "Reponse",
+          "type": "string"
+        }
+      },
+      "required": [
+        "question",
+        "reponse"
+      ],
+      "title": "QuestionReponse",
+      "type": "object"
+    },
+    "SectionFiche": {
+      "properties": {
+        "section_id": {
+          "title": "Section Id",
+          "type": "string"
+        },
+        "titre": {
+          "title": "Titre",
+          "type": "string"
+        },
+        "statut": {
+          "default": "ok",
+          "enum": [
+            "ok",
+            "echec",
+            "budget"
+          ],
+          "title": "Statut",
+          "type": "string"
+        },
+        "message": {
+          "default": "",
+          "title": "Message",
+          "type": "string"
+        },
+        "blocs": {
+          "items": {
+            "$ref": "#/$defs/BlocFiche"
+          },
+          "title": "Blocs",
+          "type": "array"
+        },
+        "rejetes": {
+          "description": "Blocs retirés par la vérification, gardés pour le banc",
+          "items": {
+            "$ref": "#/$defs/BlocFiche"
+          },
+          "title": "Rejetes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "section_id",
+        "titre"
+      ],
+      "title": "SectionFiche",
+      "type": "object"
+    },
+    "TableauBloc": {
+      "properties": {
+        "type": {
+          "const": "tableau",
+          "title": "Type",
+          "type": "string"
+        },
+        "titre": {
+          "title": "Titre",
+          "type": "string"
+        },
+        "colonnes": {
+          "description": "2 à 5 en-têtes de colonnes",
+          "items": {
+            "type": "string"
+          },
+          "title": "Colonnes",
+          "type": "array"
+        },
+        "lignes": {
+          "description": "Chaque ligne a autant de cellules que de colonnes",
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Lignes",
+          "type": "array"
+        },
+        "passages": {
+          "description": "Numéros des extraits qui justifient le bloc, tels que donnés entre crochets",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Passages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "titre",
+        "colonnes",
+        "lignes",
+        "passages"
+      ],
+      "title": "TableauBloc",
+      "type": "object"
+    },
+    "TexteBloc": {
+      "properties": {
+        "type": {
+          "const": "texte",
+          "title": "Type",
+          "type": "string"
+        },
+        "titre": {
+          "description": "Titre court, ou vide",
+          "title": "Titre",
+          "type": "string"
+        },
+        "contenu": {
+          "description": "2 à 4 phrases courtes, fidèles au cours",
+          "title": "Contenu",
+          "type": "string"
+        },
+        "passages": {
+          "description": "Numéros des extraits qui justifient le bloc, tels que donnés entre crochets",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Passages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "titre",
+        "contenu",
+        "passages"
+      ],
+      "title": "TexteBloc",
+      "type": "object"
+    },
+    "Usage": {
+      "properties": {
+        "calls": {
+          "default": 0,
+          "title": "Calls",
+          "type": "integer"
+        },
+        "cached_calls": {
+          "default": 0,
+          "title": "Cached Calls",
+          "type": "integer"
+        },
+        "failed_calls": {
+          "default": 0,
+          "title": "Failed Calls",
+          "type": "integer"
+        },
+        "retries": {
+          "default": 0,
+          "title": "Retries",
+          "type": "integer"
+        },
+        "input_tokens": {
+          "default": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "output_tokens": {
+          "default": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        },
+        "cost_usd": {
+          "default": 0.0,
+          "title": "Cost Usd",
+          "type": "number"
+        },
+        "judge_calls": {
+          "default": 0,
+          "title": "Judge Calls",
+          "type": "integer"
+        },
+        "judge_input_tokens": {
+          "default": 0,
+          "title": "Judge Input Tokens",
+          "type": "integer"
+        },
+        "judge_output_tokens": {
+          "default": 0,
+          "title": "Judge Output Tokens",
+          "type": "integer"
+        },
+        "judge_cost_usd": {
+          "default": 0.0,
+          "title": "Judge Cost Usd",
+          "type": "number"
+        }
+      },
+      "title": "Usage",
+      "type": "object"
+    },
+    "Variable": {
+      "properties": {
+        "symbole": {
+          "title": "Symbole",
+          "type": "string"
+        },
+        "signification": {
+          "title": "Signification",
+          "type": "string"
+        }
+      },
+      "required": [
+        "symbole",
+        "signification"
+      ],
+      "title": "Variable",
+      "type": "object"
+    }
+  },
+  "description": "Contrat de sortie du module, version 1.",
+  "properties": {
+    "schema_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "document_id": {
+      "title": "Document Id",
+      "type": "string"
+    },
+    "document_title": {
+      "title": "Document Title",
+      "type": "string"
+    },
+    "gabarit": {
+      "$ref": "#/$defs/GabaritInfo"
+    },
+    "titre": {
+      "title": "Titre",
+      "type": "string"
+    },
+    "accroche": {
+      "title": "Accroche",
+      "type": "string"
+    },
+    "fil_conducteur": {
+      "title": "Fil Conducteur",
+      "type": "string"
+    },
+    "chapitres": {
+      "items": {
+        "$ref": "#/$defs/ChapitreFiche"
+      },
+      "title": "Chapitres",
+      "type": "array"
+    },
+    "couverture": {
+      "$ref": "#/$defs/Couverture"
+    },
+    "usage": {
+      "$ref": "#/$defs/Usage"
+    },
+    "metrics": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string"
+          }
+        ]
+      },
+      "title": "Metrics",
+      "type": "object"
+    },
+    "errors": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Errors",
+      "type": "array"
+    }
+  },
+  "required": [
+    "document_id",
+    "document_title",
+    "gabarit",
+    "titre",
+    "accroche",
+    "fil_conducteur",
+    "chapitres"
+  ],
+  "title": "Fiche",
+  "type": "object"
+}
