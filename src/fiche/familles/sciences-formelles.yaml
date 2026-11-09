@@ -1,17 +1,23 @@
 id: sciences-formelles
-version: 1
+version: 2
 nom: Sciences formelles
 filieres: [mathématiques, physique, mécanique, informatique théorique, statistiques]
 pour_etudiant: >
-  Les définitions d'abord, puis les théorèmes, propriétés et formules dans des encadrés avec
-  leurs hypothèses. Un exemple résolu quand le cours en donne un, les erreurs classiques, et un
-  formulaire à relire la veille.
+  Les définitions d'abord, puis les théorèmes et les formules avec leurs hypothèses. Un exemple
+  résolu quand le cours en donne un, les erreurs classiques, et à la fin de chaque chapitre ce
+  qu'il faut savoir redire.
 ton: >
   Précis et sobre. Les notations du cours, jamais d'autres. Une formule s'écrit en LaTeX entre
-  $ $. Pas d'adjectifs, pas de « il est important de ».
+  $ $.
+voix: >
+  Écris comme un manuel de maths bien fait, en plus court. Un théorème s'énonce en entier, avec
+  ses hypothèses : sans elles il est faux. Une définition dit ce qu'est l'objet, pas à quoi il
+  sert. Quand le cours donne l'idée d'une preuve, résume-la en une ou deux phrases ; sinon, rien.
+  Les pièges opposent ce qu'on croit et ce qui est vrai, en tutoyant (« tu ne peux pas
+  appliquer… sans… »).
 blocs:
   - type: definition
-    usage: Chaque objet ou terme que la section introduit, avec sa notation. Une définition par terme.
+    usage: Chaque objet que la section introduit, avec sa notation. Une définition par terme.
   - type: encadre
     usage: >
       Tout résultat à savoir par cœur : théorème, proposition, propriété, formule, loi. Les
@@ -19,32 +25,35 @@ blocs:
       preuve ou l'usage dans « idee » si le cours le dit.
   - type: tableau
     usage: >
-      Quand la section compare ou liste des cas (dérivées usuelles, lois, types de forces,
-      conditions d'équilibre) : une ligne par cas, une colonne par critère.
+      Quand la section compare ou liste des cas sur les mêmes critères (suites usuelles,
+      dérivées, systèmes de coordonnées, types de mouvement) : une ligne par cas.
   - type: etapes
     usage: Une méthode de résolution ou un raisonnement que le cours déroule dans l'ordre.
   - type: exemple
-    usage: Un exemple ou exercice que le cours résout, avec ses étapes et ce qu'il illustre.
+    usage: >
+      Un exemple ou exercice que le cours résout : souvent la meilleure forme pour une section de
+      calcul, à elle seule.
   - type: piege
     usage: >
-      Confusions entre deux résultats du cours (hypothèse oubliée, sens d'une inégalité, signe,
-      cas particulier pris pour le cas général). Seulement si les deux côtés sont dans le cours.
+      Hypothèse oubliée, réciproque fausse, signe, unité, cas particulier pris pour le cas
+      général. Seulement si les deux côtés sont dans le cours.
   - type: essentiel
-    usage: En fin de section, ce qu'il faut savoir redire sans la fiche, en 3 à 6 lignes.
+    usage: >
+      À la fin du chapitre : ce qu'il faut savoir redire sans la fiche, en phrases complètes.
   - type: autotest
-    usage: 2 ou 3 questions courtes dont la réponse est dans la section.
+    usage: >
+      À la fin du chapitre : 2 à 4 questions courtes dont la réponse est dans le chapitre.
   - type: texte
-    usage: Rare. Une transition ou une idée directrice qui n'est ni une définition ni un résultat.
+    usage: Rare. L'idée qui relie deux résultats, quand aucune autre forme ne convient.
 ordre: [texte, definition, encadre, tableau, etapes, exemple, piege, essentiel, autotest]
-max_blocs_par_section: 8
+fin_de_chapitre: [essentiel, autotest]
+max_blocs_par_section: 7
 max_texte_par_section: 1
 plan: >
-  Fais voir l'architecture logique du cours : quels objets sont définis, quels résultats
-  en découlent, lesquels servent aux suivants. Pour chaque section, dis quels résultats vont
-  dans des encadrés et ce qui mérite un tableau. Repère les sections qui ne font que calculer
-  (exemples) et celles qui posent la théorie. Le fil conducteur dit à l'étudiant quoi maîtriser
-  avant quoi.
+  Fais voir l'architecture logique du cours : quels objets sont définis, quels résultats en
+  découlent, lesquels servent aux suivants. Repère les sections qui calculent (exemple résolu,
+  piège) et celles qui posent la théorie (définitions, encadrés). Le fil conducteur dit à
+  l'étudiant quoi maîtriser avant quoi.
 redaction: >
-  Les énoncés sont exacts et complets : un théorème sans ses hypothèses est faux. Garde les
-  notations du cours. Préfère un encadré à un texte, un tableau à une liste de phrases. Les
-  réponses de l'autotest se trouvent dans les extraits. N'invente ni exemple ni contre-exemple.
+  Les énoncés sont exacts et complets. Garde les notations du cours. Préfère un encadré à un
+  texte, un tableau à une liste de phrases. N'invente ni exemple ni contre-exemple.

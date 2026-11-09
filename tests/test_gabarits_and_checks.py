@@ -7,7 +7,7 @@ from fiche.config import env_example
 from fiche.errors import UnknownGabarit
 from fiche.gabarits import BUILTIN_DIR, Gabarit, get_gabarit, load_gabarits
 from fiche.models import BLOCK_KINDS, FichePlan, PlanSection, SectionBlocs, Verdict, Verdicts
-from fiche.run import check_blocs, check_plan, check_verdicts
+from fiche.run import Unit, check_blocs, check_plan, check_verdicts
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -35,16 +35,25 @@ def test_gabarit_rejects_unknown_block_types_and_duplicates():
         Gabarit.model_validate(data)
 
 
+def _units(*ends: bool) -> list[Unit]:
+    return [
+        Unit(index=i, title=f"u{i}", chapter=None, sections=[], passages=[], fin_chapitre=end)
+        for i, end in enumerate(ends, start=1)
+    ]
+
+
 def test_plan_check_wants_every_unit_once_with_permitted_blocks():
     g = get_gabarit("sciences-formelles")
-    check = check_plan(2, g)
+    check = check_plan(_units(False, True), g)
     ok = FichePlan(
         titre="t",
         accroche="a",
         fil_conducteur="f",
         sections=[
             PlanSection(section=1, titre="u1", blocs=["definition"], consigne="c"),
-            PlanSection(section=2, titre="u2", blocs=["encadre", "essentiel"], consigne="c"),
+            PlanSection(
+                section=2, titre="u2", blocs=["encadre", "essentiel", "autotest"], consigne="c"
+            ),
         ],
     )
     assert check(ok) is None
@@ -56,6 +65,30 @@ def test_plan_check_wants_every_unit_once_with_permitted_blocks():
     too_much_text = ok.model_copy(deep=True)
     too_much_text.sections[0].blocs = ["texte", "texte"]
     assert "bloc texte" in (check(too_much_text) or "")
+
+
+def test_plan_check_keeps_summary_and_quiz_for_chapter_ends():
+    g = get_gabarit("vivant-sante")
+    check = check_plan(_units(False, True), g)
+    early = FichePlan(
+        titre="t",
+        accroche="a",
+        fil_conducteur="f",
+        sections=[
+            PlanSection(section=1, titre="u1", blocs=["etapes", "essentiel"], consigne="c"),
+            PlanSection(section=2, titre="u2", blocs=["tableau"], consigne="c"),
+        ],
+    )
+    message = check(early) or ""
+    assert "section 1 : essentiel seulement en fin de chapitre" in message
+    assert "section 2 (fin de chapitre) : il manque essentiel, autotest" in message
+
+
+def test_gabarit_closing_blocks_must_be_allowed():
+    data = yaml.safe_load((BUILTIN_DIR / "vivant-sante.yaml").read_text("utf-8"))
+    data["fin_de_chapitre"] = ["exemple"]
+    with pytest.raises(ValueError, match="fin_de_chapitre"):
+        Gabarit.model_validate(data)
 
 
 def test_blocs_check_reports_every_problem_at_once():

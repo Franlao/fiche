@@ -166,11 +166,13 @@ def test_html_render_shows_every_block_form(
         judge=fake,
     )
     html = render_html(fiche, Course.load(course_path))
-    assert "<table>" in html and 'class="bloc encadre"' in html and "Formule" in html
-    assert "voir les extraits" in html and "p. 1" in html
+    assert "<table>" in html and 'class="bloc encadre"' in html and "formule" in html
+    assert "Voir le passage du cours" in html and '<span class="page">p. 1</span>' in html
     assert "Mesures du labo" in html and "mathjax" in html
-    # rendu sans le cours : pas d'extraits, pas d'erreur
-    assert "voir les extraits" not in render_html(fiche)
+    assert "À retenir du chapitre" in html
+    # forme humaine : pas d'étiquette en capitales, pas de symboles à la place de la mise en page
+    assert "text-transform: uppercase" not in html and "✗" not in html and "✓" not in html
+    assert "Voir le passage du cours" not in render_html(fiche)  # sans le cours, pas d'extraits
 
 
 def test_request_options_override_settings(settings: Settings):
@@ -195,3 +197,27 @@ def test_lost_characters_are_written_as_entities():
     from fiche.render import e
 
     assert e("� 95 % <b>") == "&#xFFFD; 95 % &lt;b&gt;"
+
+
+def test_writing_is_cleaned_and_measured_at_assembly(course_path: Path, settings: Settings):
+    def handler(system: str, user: str, schema: type[Any]) -> Any:
+        if schema is SectionBlocs:
+            out = default_blocs(user)
+            first = out.blocs[0]
+            assert first.type == "definition"
+            first.definition = "Un fluide — sans viscosité — coule bien… entre 5–15 °C"
+            return out
+        return default_handler(system, user, schema)
+
+    fake = FakeLLMProvider(DiskCache(settings.cache_dir), handler)
+    fiche = run(
+        FicheRequest(course=course_path, gabarit="sciences-formelles"),
+        settings,
+        writer=fake,
+        judge=None,
+    )
+    bloc = fiche.blocs()[0].bloc
+    assert bloc.type == "definition"
+    assert bloc.definition == "Un fluide, sans viscosité, coule bien entre 5 à 15 °C"
+    assert fiche.metrics["tics"] == 0 and fiche.metrics["mots"] > 0
+    assert "titres_en_formule" in fiche.metrics and "monotonie" in fiche.metrics

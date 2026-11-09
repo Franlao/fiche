@@ -1,8 +1,14 @@
-"""Rendu HTML d'une fiche : une page autonome, lisible au téléphone, pour juger sur pièces.
+"""Rendu HTML d'une fiche : la forme de la fiche telle que les gabarits la conçoivent.
 
-C'est le rendu du labo, pas celui de l'application : il montre chaque type de bloc dans une
-forme distincte, la page source de chaque bloc, les extraits cités, et en bas les mesures.
-Les formules LaTeX sont rendues par MathJax (sortie SVG, sans police à charger).
+Une fiche se lit comme un document fait par une personne soigneuse, pas comme un empilement de
+cartes : titres qui portent l'idée, têtes de paragraphe intégrées au texte (« Théorème. … »),
+pages sources dans la marge, un seul encadré pour ce qui se sait par cœur, l'idée fausse barrée
+dans les pièges, « À retenir » et « Teste-toi » qui ferment le chapitre. Pas d'étiquette en
+capitales au-dessus des titres, pas de barre de couleur sur le côté, pas de symbole à la place
+de la mise en forme.
+
+C'est le rendu du labo : l'écran de l'application viendra avec l'identité visuelle de wiliyu.
+Les formules LaTeX sont rendues par MathJax (sortie SVG).
 """
 
 from __future__ import annotations
@@ -12,7 +18,6 @@ from html import escape
 
 from fiche.course import Course, Passage
 from fiche.models import (
-    BLOCK_LABELS,
     AutotestBloc,
     Bloc,
     BlocFiche,
@@ -41,78 +46,98 @@ NATURE_LABELS = {
 
 STYLE = """
 :root {
-  --bg: #f6f7f9; --paper: #ffffff; --fg: #1c2330; --muted: #5b6577; --line: #d7dce5;
-  --accent: #2f6fb3; --accent-soft: #e6effa; --def: #2f7a4e; --def-soft: #e3f2e8;
-  --warn: #b5541c; --warn-soft: #fbe9dc; --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
-  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --ground: #fbfbf9; --ink: #1b1d22; --soft: #5d6370; --rule: #d9dbe0; --rule-strong: #1b1d22;
+  --accent: #2346b8; --box: #eef1f9; --alert: #b3401a;
+  --head: "Schibsted Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+  --text: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #141820; --paper: #1d2330; --fg: #e8ecf2; --muted: #a7b0c0; --line: #343c4c;
-  --accent: #7fb0e6; --accent-soft: #1f3048; --def: #74c592; --def-soft: #1f3a2a;
-  --warn: #eb9a62; --warn-soft: #43291a; color-scheme: dark; } }
+  --ground: #15171b; --ink: #e8e9ec; --soft: #a4a9b5; --rule: #343841; --rule-strong: #e8e9ec;
+  --accent: #8fa8ff; --box: #1e2330; --alert: #f08b62; color-scheme: dark; } }
 :root[data-theme="dark"] {
-  --bg: #141820; --paper: #1d2330; --fg: #e8ecf2; --muted: #a7b0c0; --line: #343c4c;
-  --accent: #7fb0e6; --accent-soft: #1f3048; --def: #74c592; --def-soft: #1f3a2a;
-  --warn: #eb9a62; --warn-soft: #43291a; color-scheme: dark; }
-body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.5;
+  --ground: #15171b; --ink: #e8e9ec; --soft: #a4a9b5; --rule: #343841; --rule-strong: #e8e9ec;
+  --accent: #8fa8ff; --box: #1e2330; --alert: #f08b62; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--ground); color: var(--ink); font-family: var(--text); font-size: 17px; line-height: 1.6;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 24px 48px; }
-main { max-width: 820px; margin: 0 auto; display: grid; gap: 26px; }
-h1, h2, h3, h4 { font-family: var(--display); margin: 0; text-wrap: balance; line-height: 1.2; }
-h1 { font-size: clamp(26px, 4vw, 36px); }
-h2 { font-size: 22px; padding-top: 18px; border-top: 2px solid var(--accent); }
-h3 { font-size: 19px; color: var(--accent); }
-h4 { font-size: 16.5px; }
+  padding-block: 40px 64px; }
+::selection { background: var(--box); color: var(--ink); }
+main { max-width: 860px; margin: 0 auto; display: grid; grid-template-columns: 72px minmax(0, 1fr); column-gap: 28px; }
+main > * { grid-column: 2; }
+@media (max-width: 640px) { main { grid-template-columns: minmax(0, 1fr); } main > * { grid-column: 1; } }
+h1, h2, h3, h4 { font-family: var(--head); margin: 0; line-height: 1.2; text-wrap: balance; }
 p { margin: 0; }
-.kicker { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.lead { color: var(--muted); font-size: 18px; }
-.fil { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; display: grid; gap: 6px; }
-.toc { display: grid; gap: 4px; font-size: 15px; }
-.toc a { color: var(--accent); text-decoration: none; }
-.toc .chap { font-weight: 700; margin-top: 6px; }
-section.unit { display: grid; gap: 14px; }
-.bloc { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; display: grid; gap: 8px; min-width: 0; }
-.bloc .label { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.bloc.definition { border-left: 4px solid var(--def); }
-.bloc.encadre { border: 2px solid var(--accent); background: var(--accent-soft); }
-.bloc.piege { border-left: 4px solid var(--warn); }
-.bloc.essentiel { background: var(--def-soft); border-color: var(--def); }
-.bloc.texte { border: none; background: transparent; padding: 0 2px; }
-.nature { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
-.enonce { font-size: 18px; }
-.conds, .vars { font-size: 15px; color: var(--muted); margin: 0; padding-left: 18px; }
-.vars { list-style: none; padding: 0; display: grid; gap: 2px; }
-.vars b { color: var(--fg); font-weight: 600; }
-table { border-collapse: collapse; width: 100%; font-size: 15.5px; }
-th, td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: top; }
-th { background: var(--accent-soft); font-weight: 700; }
+a { color: var(--accent); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.titre { display: grid; gap: 14px; padding-bottom: 28px; border-bottom: 2px solid var(--rule-strong); margin-bottom: 28px; }
+.titre h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 800; letter-spacing: -0.02em; }
+.titre .accroche { font-size: 20px; line-height: 1.5; max-width: 34em; }
+.fil { display: grid; gap: 8px; margin-bottom: 28px; max-width: 38em; }
+.fil h2 { font-size: 17px; }
+.fil p { color: var(--soft); }
+.sommaire { margin: 0 0 40px; padding: 0; list-style: none; display: grid; gap: 2px; font-size: 16px; }
+.sommaire li { display: flex; gap: 12px; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--rule); }
+.sommaire li.chap { font-family: var(--head); font-weight: 700; border-bottom-color: var(--rule-strong); padding-top: 14px; }
+.sommaire a { color: var(--ink); text-decoration: none; }
+.sommaire a:hover { color: var(--accent); }
+.sommaire span { color: var(--soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+h2.chapitre { font-size: 28px; font-weight: 800; letter-spacing: -0.01em; margin: 48px 0 6px; }
+h3.section { font-size: 21px; font-weight: 700; margin: 34px 0 14px; }
+.note { color: var(--alert); font-size: 15px; margin-bottom: 12px; }
+
+.bloc { position: relative; margin: 0 0 22px; display: grid; gap: 8px; min-width: 0; }
+.page { position: absolute; left: -100px; top: 3px; width: 72px; text-align: right; font-size: 13px; color: var(--soft); font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) { .page { position: static; width: auto; text-align: left; order: 9; } }
+.runin { font-family: var(--head); font-weight: 700; }
+h4 { font-size: 17px; }
+
+.encadre { border: 1.5px solid var(--rule-strong); background: var(--box); border-radius: 4px; padding: 16px 20px; }
+.encadre .page { left: -102px; top: 19px; }
+.encadre .tete { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.encadre .nature { font-size: 14px; letter-spacing: .04em; font-variant: small-caps; color: var(--soft); }
+.encadre .enonce { font-size: 18px; }
+.encadre ul { margin: 0; padding-left: 20px; }
+.encadre .ou, .encadre .idee { font-size: 15.5px; color: var(--soft); }
+
 .table-wrap { overflow-x: auto; }
-ol.steps { margin: 0; padding-left: 0; list-style: none; counter-reset: s; display: grid; gap: 8px; }
-ol.steps li { counter-increment: s; display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; }
-ol.steps li::before { content: counter(s); width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: var(--paper); font-weight: 700; display: grid; place-items: center; font-size: 14px; }
-ol.steps b { display: block; }
-ol.timeline { margin: 0; padding-left: 18px; border-left: 2px solid var(--accent); list-style: none; display: grid; gap: 8px; }
-ol.timeline li { position: relative; }
-ol.timeline li::before { content: ""; position: absolute; left: -24px; top: 8px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
-ol.timeline b { color: var(--accent); margin-right: 6px; }
-dl.cases { margin: 0; display: grid; gap: 6px; }
-dl.cases div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 10px; }
-dl.cases dt { font-weight: 600; } dl.cases dt::before { content: "Si "; color: var(--muted); font-weight: 400; }
-dl.cases dd { margin: 0; } dl.cases dd::before { content: "→ "; color: var(--accent); }
-ul.points { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
-.pieges { display: grid; gap: 8px; }
-.pieges div { display: grid; gap: 2px; }
-.pieges .err { color: var(--warn); text-decoration: line-through; text-decoration-thickness: 1px; }
-details.q { border-top: 1px solid var(--line); padding: 8px 0; }
-details.q summary { cursor: pointer; font-weight: 600; }
-details.q p { padding-top: 6px; color: var(--muted); }
-.src { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
-.src details { display: inline; } .src summary { cursor: pointer; color: var(--accent); display: inline; }
-.src blockquote { margin: 8px 0 0; padding: 8px 12px; border-left: 3px solid var(--line); font-size: 14px; white-space: pre-wrap; color: var(--fg); }
-.note { font-size: 14px; color: var(--warn); }
-.mesures { font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 4px; }
+table { border-collapse: collapse; width: 100%; font-size: 15.5px; font-variant-numeric: tabular-nums; border-top: 2px solid var(--rule-strong); border-bottom: 2px solid var(--rule-strong); }
+th { font-family: var(--head); font-weight: 700; text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule-strong); vertical-align: bottom; }
+td { padding: 7px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+
+ol.etapes { margin: 0; padding: 0; list-style: none; counter-reset: e; display: grid; gap: 10px; }
+ol.etapes li { counter-increment: e; display: grid; grid-template-columns: 34px minmax(0, 1fr); }
+ol.etapes li::before { content: counter(e); font-family: var(--head); font-weight: 800; font-size: 24px; line-height: 1.1; color: var(--accent); font-variant-numeric: tabular-nums; }
+
+dl.frise { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 18px; }
+dl.frise dt { font-family: var(--head); font-weight: 700; font-variant-numeric: tabular-nums; }
+dl.frise dd { margin: 0; }
+
+ul.cas { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+ol.resolution { margin: 0; padding-left: 22px; display: grid; gap: 4px; }
+
+.pieges { display: grid; gap: 10px; }
+.pieges .attention { color: var(--alert); }
+.pieges s { text-decoration-color: var(--alert); text-decoration-thickness: 2px; color: var(--soft); }
+
+.retenir { border-top: 2px solid var(--rule-strong); padding-top: 16px; margin-top: 30px; }
+.retenir .page { top: 19px; }
+.retenir ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+
+.teste details { border-bottom: 1px solid var(--rule); padding: 9px 0; }
+.teste summary { cursor: pointer; }
+.teste summary::marker { color: var(--accent); }
+.teste details p { padding: 6px 0 2px 18px; color: var(--soft); }
+
+.sources { font-size: 14px; }
+.sources summary { cursor: pointer; color: var(--soft); }
+.sources blockquote { margin: 8px 0 0; padding: 4px 0 4px 14px; border-left: 1px solid var(--rule); white-space: pre-wrap; color: var(--soft); }
+
+.mesures { margin-top: 56px; padding-top: 14px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--soft); display: grid; gap: 4px; }
+.mesures h2 { font-size: 15px; color: var(--ink); }
 .mesures ul { margin: 0; padding-left: 18px; }
-@media (max-width: 480px) { dl.cases div { grid-template-columns: 1fr; } }
 """
 
 MATHJAX = (
@@ -121,10 +146,29 @@ MATHJAX = (
     '<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script>'
 )
 
+GENERIC_TITLES = {"l'essentiel", "l'essentiel à retenir", "à retenir", "teste-toi", "testez-vous"}
+
 
 def e(text: str) -> str:
     # U+FFFD : caractère perdu à la lecture du PDF, gardé visible mais écrit en entité
     return escape(text, quote=True).replace("�", "&#xFFFD;")
+
+
+def _sentence(text: str) -> str:
+    """Texte qui se termine par une ponctuation forte, pour les têtes intégrées."""
+    text = text.strip()
+    return text if text[-1:] in ".?!:" else text + "."
+
+
+def _lower_first(text: str) -> str:
+    return text[:1].lower() + text[1:] if text[:2] != text[:2].upper() else text
+
+
+def _pages(entries: list[BlocFiche]) -> str:
+    pages = sorted({p for entry in entries for p in entry.pages})
+    if not pages:
+        return ""
+    return f"p. {pages[0]}" if pages[0] == pages[-1] else f"p. {pages[0]} à {pages[-1]}"
 
 
 def render_html(fiche: Fiche, course: Course | None = None) -> str:
@@ -132,21 +176,20 @@ def render_html(fiche: Fiche, course: Course | None = None) -> str:
     out: list[str] = [
         f"<title>{e(fiche.titre)}</title>",
         '<meta name="claude:viewport-fit-sides" content="cover">',
-        '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap">',
+        '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@600;700;800&family=Atkinson+Hyperlegible+Next:wght@400;700&display=swap">',
         f"<style>{STYLE}</style>",
         MATHJAX,
-        "<main>",
-        "<header>",
-        f'<p class="kicker">Fiche de révision · gabarit {e(fiche.gabarit.nom)}</p>',
+        '<main lang="fr">',
+        '<header class="titre">',
         f"<h1>{e(fiche.titre)}</h1>",
-        f'<p class="lead">{e(fiche.accroche)}</p>',
+        f'<p class="accroche">{e(fiche.accroche)}</p>',
         "</header>",
-        f'<div class="fil"><p class="kicker">Fil conducteur</p><p>{e(fiche.fil_conducteur)}</p></div>',
-        _toc(fiche),
+        f'<section class="fil"><h2>Le fil du cours</h2><p>{e(fiche.fil_conducteur)}</p></section>',
+        _sommaire(fiche),
     ]
     for ci, chapter in enumerate(fiche.chapitres, start=1):
         if chapter.titre:
-            out.append(f'<h2 id="c{ci}">{e(chapter.titre)}</h2>')
+            out.append(f'<h2 class="chapitre" id="c{ci}">{e(chapter.titre)}</h2>')
         for si, section in enumerate(chapter.sections, start=1):
             out.append(_section(section, f"s{ci}-{si}", passages))
     out.append(_mesures(fiche))
@@ -154,19 +197,24 @@ def render_html(fiche: Fiche, course: Course | None = None) -> str:
     return "\n".join(out)
 
 
-def _toc(fiche: Fiche) -> str:
-    items: list[str] = ['<nav class="toc"><p class="kicker">Parcours</p>']
+def _sommaire(fiche: Fiche) -> str:
+    items: list[str] = ['<ol class="sommaire" aria-label="Sommaire">']
     for ci, chapter in enumerate(fiche.chapitres, start=1):
         if chapter.titre:
-            items.append(f'<a class="chap" href="#c{ci}">{e(chapter.titre)}</a>')
+            chapter_blocs = [b for s in chapter.sections for b in s.blocs]
+            items.append(
+                f'<li class="chap"><a href="#c{ci}">{e(chapter.titre)}</a><span>{_pages(chapter_blocs)}</span></li>'
+            )
         for si, section in enumerate(chapter.sections, start=1):
-            items.append(f'<a href="#s{ci}-{si}">{e(section.titre)}</a>')
-    items.append("</nav>")
+            items.append(
+                f'<li><a href="#s{ci}-{si}">{e(section.titre)}</a><span>{_pages(section.blocs)}</span></li>'
+            )
+    items.append("</ol>")
     return "\n".join(items)
 
 
 def _section(section: SectionFiche, anchor: str, passages: Mapping[str, Passage]) -> str:
-    parts = [f'<section class="unit" id="{anchor}">', f"<h3>{e(section.titre)}</h3>"]
+    parts = [f'<h3 class="section" id="{anchor}">{e(section.titre)}</h3>']
     if section.statut != "ok":
         parts.append(
             f'<p class="note">Section non rédigée ({section.statut}) : {e(section.message)}</p>'
@@ -175,112 +223,114 @@ def _section(section: SectionFiche, anchor: str, passages: Mapping[str, Passage]
         parts.append(f'<p class="note">{e(section.message)}</p>')
     for entry in section.blocs:
         parts.append(_bloc(entry, passages))
-    parts.append("</section>")
     return "\n".join(parts)
 
 
 def _bloc(entry: BlocFiche, passages: Mapping[str, Passage]) -> str:
     bloc = entry.bloc
-    label = BLOCK_LABELS[bloc.type]
-    body = _body(bloc)
-    title = f"<h4>{e(bloc.titre)}</h4>" if bloc.titre and not isinstance(bloc, EncadreBloc) else ""
-    label_html = (
-        "" if isinstance(bloc, TexteBloc | EncadreBloc) else f'<span class="label">{label}</span>'
-    )
-    return f'<article class="bloc {bloc.type}">{label_html}{title}{body}{_sources(entry, passages)}</article>'
+    classes = {"encadre": "bloc encadre", "essentiel": "bloc retenir", "autotest": "bloc teste"}
+    css = classes.get(bloc.type, "bloc")
+    page = _pages([entry])
+    margin = f'<span class="page">{page}</span>' if page else ""
+    return f'<div class="{css}">{margin}{_body(bloc)}{_sources(entry, passages)}</div>'
+
+
+def _variables(bloc: EncadreBloc) -> str:
+    parts = [f"{e(v.symbole)} {e(_lower_first(v.signification))}" for v in bloc.variables]
+    if not parts:
+        return ""
+    joined = parts[0] if len(parts) == 1 else ", ".join(parts[:-1]) + " et " + parts[-1]
+    return f'<p class="ou">Où {joined}.</p>'
 
 
 def _body(bloc: Bloc) -> str:
     if isinstance(bloc, TexteBloc):
-        return f"<p>{e(bloc.contenu)}</p>"
+        head = f"<h4>{e(bloc.titre)}</h4>" if bloc.titre else ""
+        return f"{head}<p>{e(bloc.contenu)}</p>"
     if isinstance(bloc, DefinitionBloc):
-        ex = f'<p class="conds">Exemple : {e(bloc.exemple)}</p>' if bloc.exemple else ""
-        return f"<p>{e(bloc.definition)}</p>{ex}"
+        ex = f"<p>Par exemple, {e(_lower_first(bloc.exemple))}</p>" if bloc.exemple else ""
+        return (
+            f'<p><span class="runin">{e(_sentence(bloc.titre))}</span> {e(bloc.definition)}</p>{ex}'
+        )
     if isinstance(bloc, EncadreBloc):
+        nature = NATURE_LABELS.get(bloc.nature, bloc.nature)
+        label = (
+            ""
+            if bloc.titre.lower().startswith(nature.lower())
+            else f'<span class="nature">{nature.lower()}</span>'
+        )
         parts = [
-            f'<span class="nature">{NATURE_LABELS.get(bloc.nature, bloc.nature)}</span>',
-            f"<h4>{e(bloc.titre)}</h4>",
+            f'<div class="tete"><h4>{e(bloc.titre)}</h4>{label}</div>',
             f'<p class="enonce">{e(bloc.enonce)}</p>',
         ]
         if bloc.conditions:
-            parts.append(
-                '<ul class="conds">'
-                + "".join(f"<li>{e(c)}</li>" for c in bloc.conditions)
-                + "</ul>"
-            )
-        if bloc.variables:
-            parts.append(
-                '<ul class="vars">'
-                + "".join(
-                    f"<li><b>{e(v.symbole)}</b> : {e(v.signification)}</li>" for v in bloc.variables
-                )
-                + "</ul>"
-            )
+            word = "Hypothèses" if bloc.nature in ("theoreme", "propriete") else "Conditions"
+            items = "".join(f"<li>{e(c)}</li>" for c in bloc.conditions)
+            parts.append(f"<p>{word} :</p><ul>{items}</ul>")
+        parts.append(_variables(bloc))
         if bloc.idee:
-            parts.append(f'<p class="conds" style="padding:0">{e(bloc.idee)}</p>')
+            parts.append(f'<p class="idee">{e(bloc.idee)}</p>')
         return "".join(parts)
     if isinstance(bloc, TableauBloc):
-        head = "".join(f"<th>{e(c)}</th>" for c in bloc.colonnes)
+        head = "".join(f'<th scope="col">{e(c)}</th>' for c in bloc.colonnes)
         rows = "".join(
             "<tr>" + "".join(f"<td>{e(c)}</td>" for c in row) + "</tr>" for row in bloc.lignes
         )
-        return f'<div class="table-wrap"><table><thead><tr>{head}</tr></thead><tbody>{rows}</tbody></table></div>'
+        return (
+            f'<h4>{e(bloc.titre)}</h4><div class="table-wrap"><table><thead><tr>{head}</tr></thead>'
+            f"<tbody>{rows}</tbody></table></div>"
+        )
     if isinstance(bloc, EtapesBloc):
-        return (
-            '<ol class="steps">'
-            + "".join(
-                f"<li><span><b>{e(s.titre)}</b>{e(s.detail)}</span></li>" for s in bloc.etapes
-            )
-            + "</ol>"
+        steps = "".join(
+            f'<li><p><span class="runin">{e(_sentence(s.titre))}</span> {e(s.detail)}</p></li>'
+            for s in bloc.etapes
         )
+        return f'<h4>{e(bloc.titre)}</h4><ol class="etapes">{steps}</ol>'
     if isinstance(bloc, FriseBloc):
-        return (
-            '<ol class="timeline">'
-            + "".join(f"<li><b>{e(ev.repere)}</b>{e(ev.evenement)}</li>" for ev in bloc.evenements)
-            + "</ol>"
+        items = "".join(
+            f"<dt>{e(ev.repere)}</dt><dd>{e(ev.evenement)}</dd>" for ev in bloc.evenements
         )
+        return f'<h4>{e(bloc.titre)}</h4><dl class="frise">{items}</dl>'
     if isinstance(bloc, DecisionBloc):
-        return (
-            f"<p>{e(bloc.situation)}</p>"
-            + '<dl class="cases">'
-            + "".join(f"<div><dt>{e(c.si)}</dt><dd>{e(c.alors)}</dd></div>" for c in bloc.cas)
-            + "</dl>"
+        cas = "".join(
+            f"<li>Si {e(_lower_first(c.si.rstrip('.')))} : {e(_lower_first(c.alors))}</li>"
+            for c in bloc.cas
         )
+        return f'<h4>{e(bloc.titre)}</h4><p>{e(bloc.situation)}</p><ul class="cas">{cas}</ul>'
     if isinstance(bloc, ExempleBloc):
-        steps = "".join(f"<li><span>{e(s)}</span></li>" for s in bloc.resolution)
-        return f'<p><b>Énoncé.</b> {e(bloc.enonce)}</p><ol class="steps">{steps}</ol><p><b>À retenir.</b> {e(bloc.resultat)}</p>'
-    if isinstance(bloc, PiegeBloc):
+        steps = "".join(f"<li>{e(s)}</li>" for s in bloc.resolution)
         return (
-            '<div class="pieges">'
-            + "".join(
-                f'<div><span class="err">{e(p.erreur)}</span><span>{e(p.correction)}</span></div>'
-                for p in bloc.pieges
-            )
-            + "</div>"
+            f'<p><span class="runin">Exemple. {e(_sentence(bloc.titre))}</span> {e(bloc.enonce)}</p>'
+            f'<ol class="resolution">{steps}</ol>'
+            f'<p><span class="runin">Ce qu\'on en retient.</span> {e(bloc.resultat)}</p>'
+        )
+    if isinstance(bloc, PiegeBloc):
+        items = "".join(f"<p><s>{e(p.erreur)}</s> {e(p.correction)}</p>" for p in bloc.pieges)
+        return (
+            f'<div class="pieges"><h4><span class="attention">Attention.</span> {e(bloc.titre)}</h4>'
+            f"{items}</div>"
         )
     if isinstance(bloc, EssentielBloc):
-        return '<ul class="points">' + "".join(f"<li>{e(p)}</li>" for p in bloc.points) + "</ul>"
+        title = (
+            "À retenir du chapitre" if bloc.titre.strip().lower() in GENERIC_TITLES else bloc.titre
+        )
+        points = "".join(f"<li>{e(p)}</li>" for p in bloc.points)
+        return f"<h4>{e(title)}</h4><ul>{points}</ul>"
     if isinstance(bloc, AutotestBloc):
-        return "".join(
-            f'<details class="q"><summary>{e(q.question)}</summary><p>{e(q.reponse)}</p></details>'
+        qs = "".join(
+            f"<details><summary>{e(q.question)}</summary><p>{e(q.reponse)}</p></details>"
             for q in bloc.questions
         )
+        return f"<h4>Teste-toi</h4>{qs}"
     return ""
 
 
 def _sources(entry: BlocFiche, passages: Mapping[str, Passage]) -> str:
-    pages = ", ".join(str(p) for p in entry.pages)
-    where = f"p. {pages}" if pages else "source non située"
-    status = {True: " · vérifié", False: " · non soutenu", None: ""}[entry.verifie]
-    quotes = ""
     texts = [passages[pid].text for pid in entry.passage_ids if pid in passages]
-    if texts:
-        quotes = (
-            "<details><summary>voir les extraits</summary>"
-            + "".join(f"<blockquote>{e(t.strip())}</blockquote>" for t in texts)
-            + "</details>"
-        )
-    return f'<div class="src"><span>{where}{status}</span>{quotes}</div>'
+    if not texts:
+        return ""
+    quotes = "".join(f"<blockquote>{e(t.strip())}</blockquote>" for t in texts)
+    return f'<details class="sources"><summary>Voir le passage du cours</summary>{quotes}</details>'
 
 
 def _mesures(fiche: Fiche) -> str:
@@ -289,17 +339,19 @@ def _mesures(fiche: Fiche) -> str:
     lines = [
         f"Gabarit {e(fiche.gabarit.id)} v{fiche.gabarit.version}"
         + (f", suggéré ({e(fiche.gabarit.raison)})" if fiche.gabarit.suggere else ""),
-        f"{m.get('blocs', 0)} blocs dans {m.get('unites', 0)} unités, part structurée {m.get('part_structuree', 0)}, "
-        f"{m.get('blocs_rejetes', 0)} blocs retirés par la vérification",
-        f"Notions essentielles nommées : {fiche.couverture.couvertes} / {fiche.couverture.essentielles}",
-        f"Rédacteur {e(str(m.get('redacteur', '')))} : {u.calls} appels, {u.input_tokens} jetons entrés, "
-        f"{u.output_tokens} sortis, {u.cost_usd} $ ; vérificateur : {u.judge_calls} appels, {u.judge_cost_usd} $",
-        f"Durée {m.get('duration_s', 0)} s",
+        f"{m.get('blocs', 0)} blocs dans {m.get('unites', 0)} unités, "
+        f"{m.get('blocs_rejetes', 0)} retirés par la vérification",
+        f"Notions essentielles nommées : {fiche.couverture.couvertes} sur "
+        f"{fiche.couverture.essentielles}",
+        f"Écriture : {m.get('tics', 0)} tics pour {m.get('mots', 0)} mots, titres en formule "
+        f"{m.get('titres_en_formule', 0)}, monotonie {m.get('monotonie', 0)}",
+        f"Rédacteur {e(str(m.get('redacteur', '')))} : {u.calls} appels, {u.cost_usd} $ ; "
+        f"vérificateur {u.judge_calls} appels, {u.judge_cost_usd} $",
     ]
     errors = "".join(f"<li>{e(err)}</li>" for err in fiche.errors)
     missing = ", ".join(fiche.couverture.manquantes)
     return (
-        '<footer class="mesures"><p class="kicker">Mesures du labo</p>'
+        '<footer class="mesures"><h2>Mesures du labo</h2>'
         + "".join(f"<p>{line}</p>" for line in lines)
         + (f"<p>Notions essentielles absentes : {e(missing)}</p>" if missing else "")
         + (f"<ul>{errors}</ul>" if errors else "")

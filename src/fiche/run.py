@@ -20,10 +20,12 @@ from fiche import prompts
 from fiche.cache import DiskCache
 from fiche.config import Settings, get_settings
 from fiche.course import Course, Notion, Passage, Section
+from fiche.ecriture import mesurer, nettoyer
 from fiche.errors import ProviderError, UnknownGabarit
 from fiche.gabarits import Gabarit, load_gabarits
 from fiche.llm import LLMProvider, build_judge, build_writer
 from fiche.models import (
+    Bloc,
     BlocFiche,
     ChapitreFiche,
     Couverture,
@@ -62,6 +64,8 @@ class Unit:
     sections: list[Section]
     passages: list[Passage]
     notions: list[Notion] = field(default_factory=list)
+    fin_chapitre: bool = False
+    """Dernière unité de son chapitre : c'est là que vont « À retenir » et « Teste-toi »."""
 
     @property
     def chars(self) -> int:
@@ -102,7 +106,25 @@ def writing_units(
                 last.title = _title(chapter, last.sections, len(course.chapters()))
             else:
                 units.append(_unit(len(units) + 1, chapter, buffer, buffer_passages, course))
+    _mark_chapter_ends(units)
     return units
+
+
+GROUP_WITHOUT_CHAPTER = 3
+"""Sans chapitres, « À retenir » et « Teste-toi » ferment chaque groupe de trois unités."""
+
+
+def _mark_chapter_ends(units: list[Unit]) -> None:
+    run = 0
+    for i, unit in enumerate(units):
+        nxt = units[i + 1] if i + 1 < len(units) else None
+        run += 1
+        if (
+            nxt is None
+            or nxt.chapter is not unit.chapter
+            or (unit.chapter is None and run >= GROUP_WITHOUT_CHAPTER)
+        ):
+            unit.fin_chapitre, run = True, 0
 
 
 def _notions(course: Course, sections: list[Section]) -> list[Notion]:
@@ -162,23 +184,45 @@ class Budget:
 # --- Validateurs métier, renvoyés au modèle -----------------------------------------------------
 
 
-def check_plan(n_units: int, gabarit: Gabarit) -> Callable[[object], str | None]:
+def check_plan(units: list[Unit], gabarit: Gabarit) -> Callable[[object], str | None]:
     allowed = set(gabarit.allowed())
+    closing = list(gabarit.fin_de_chapitre)
+    ends = {u.index for u in units if u.fin_chapitre}
+    n_units = len(units)
 
     def check(out: object) -> str | None:
         assert isinstance(out, FichePlan)
         numbers = sorted(s.section for s in out.sections)
         if numbers != list(range(1, n_units + 1)):
             return f"Il faut exactement une entrée par section, numérotées de 1 à {n_units}."
+        problems: list[str] = []
         for s in out.sections:
             bad = [b for b in s.blocs if b not in allowed]
             if bad:
-                return f"Section {s.section} : blocs non permis par le gabarit : {', '.join(bad)}."
+                problems.append(
+                    f"section {s.section} : blocs non permis par le gabarit : {', '.join(bad)}"
+                )
             if not 1 <= len(s.blocs) <= gabarit.max_blocs_par_section:
-                return f"Section {s.section} : entre 1 et {gabarit.max_blocs_par_section} blocs."
+                problems.append(
+                    f"section {s.section} : entre 1 et {gabarit.max_blocs_par_section} blocs"
+                )
             if s.blocs.count("texte") > gabarit.max_texte_par_section:
-                return f"Section {s.section} : au plus {gabarit.max_texte_par_section} bloc texte."
-        return None
+                problems.append(
+                    f"section {s.section} : au plus {gabarit.max_texte_par_section} bloc texte"
+                )
+            if s.section in ends:
+                missing = [b for b in closing if b not in s.blocs]
+                if missing:
+                    problems.append(
+                        f"section {s.section} (fin de chapitre) : il manque {', '.join(missing)}"
+                    )
+            else:
+                early = [b for b in closing if b in s.blocs]
+                if early:
+                    problems.append(
+                        f"section {s.section} : {', '.join(early)} seulement en fin de chapitre"
+                    )
+        return "Corrige : " + " ; ".join(problems) + "." if problems else None
 
     return check
 
@@ -261,6 +305,8 @@ def _plan_user(course: Course, units: list[Unit]) -> str:
         head = f"[{u.index}] {u.title}"
         if u.chapter is not None and u.chapter.title.strip() and u.chapter.title != u.title:
             head += f" (chapitre : {u.chapter.title.strip()})"
+        if u.fin_chapitre:
+            head += " · FIN DE CHAPITRE"
         lines.append(head)
         if u.notions:
             for n in sorted(u.notions, key=lambda n: -n.importance)[:12]:
@@ -293,7 +339,7 @@ def make_plan(
         prompts.plan_system(gabarit),
         _plan_user(course, units),
         FichePlan,
-        check_plan(len(units), gabarit),
+        check_plan(units, gabarit),
     )
 
 
@@ -320,6 +366,47 @@ def judge_unit(judge: LLMProvider, unit: Unit, blocs: SectionBlocs) -> tuple[Ver
     )
     user = prompts.JUDGE_USER.format(extraits=_extraits(unit.passages), blocs=shown)
     return judge.structured(prompts.JUDGE_SYSTEM, user, Verdicts, check_verdicts(len(blocs.blocs)))
+
+
+# --- Écriture --------------------------------------------------------------------------------
+
+
+def _clean(value: object) -> object:
+    if isinstance(value, str):
+        return nettoyer(value)
+    if isinstance(value, list):
+        return [_clean(v) for v in value]
+    if isinstance(value, dict):
+        return {k: (_clean(v) if k != "type" else v) for k, v in value.items()}
+    return value
+
+
+def clean_bloc(bloc: Bloc) -> Bloc:
+    """Le bloc avec les corrections d'écriture sans risque (tirets, intervalles, points de
+    suspension) appliquées à chacun de ses textes."""
+    data = _clean(bloc.model_dump(mode="json"))
+    return SectionBlocs.model_validate({"blocs": [data]}).blocs[0]
+
+
+def form_metrics(fiche: Fiche) -> dict[str, float | int]:
+    """Ce qui trahit une forme générée : tics d'écriture, titres en formule, sections
+    identiques."""
+    texts = [fiche.titre, fiche.accroche, fiche.fil_conducteur]
+    for section in fiche.sections():
+        texts.append(section.titre)
+        texts.extend(b.bloc.titre + "\n" + bloc_as_text(b.bloc) for b in section.blocs)
+    mesure = mesurer("\n".join(texts))
+    titres = [s.titre for s in fiche.sections()] + [b.bloc.titre for b in fiche.blocs()]
+    formula = sum(1 for t in titres if " : " in t or t.strip().lower().startswith("du "))
+    sequences = [tuple(b.bloc.type for b in s.blocs) for s in fiche.sections() if s.blocs]
+    commonest = max((sequences.count(q) for q in set(sequences)), default=0)
+    return {
+        "mots": mesure.mots,
+        "tics": mesure.total,
+        "tics_pour_mille_mots": mesure.pour_mille_mots,
+        "titres_en_formule": round(formula / len(titres), 3) if titres else 0.0,
+        "monotonie": round(commonest / len(sequences), 3) if sequences else 0.0,
+    }
 
 
 # --- Couverture ----------------------------------------------------------------------------------
@@ -466,6 +553,7 @@ def _assemble(
                 passages = [r.unit.passages[n - 1] for n in refs]
                 pages = sorted({pg for p in passages for pg in range(p.page_start, p.page_end + 1)})
                 verdict = verdict_by_number.get(i)
+                bloc = clean_bloc(bloc)
                 entry = BlocFiche(
                     bloc=bloc,
                     passage_ids=[p.id for p in passages],
@@ -484,7 +572,7 @@ def _assemble(
             errors.append(f"{r.unit.title} : {r.statut} : {r.message}")
         section = SectionFiche(
             section_id=r.unit.sections[0].id,
-            titre=r.planned.titre or r.unit.title,
+            titre=nettoyer(r.planned.titre or r.unit.title),
             statut=r.statut,
             message=r.message,
             blocs=kept,
@@ -506,9 +594,9 @@ def _assemble(
         document_id=course.document.id,
         document_title=course.document.title,
         gabarit=info,
-        titre=plan.titre,
-        accroche=plan.accroche,
-        fil_conducteur=plan.fil_conducteur,
+        titre=nettoyer(plan.titre),
+        accroche=nettoyer(plan.accroche),
+        fil_conducteur=nettoyer(plan.fil_conducteur),
         chapitres=chapters,
         errors=errors,
     )
@@ -551,4 +639,5 @@ def _assemble(
             "verificateur": f"{judge.name}:{judge.model}" if judge else "",
         }
     )
+    fiche.metrics.update(form_metrics(fiche))
     return fiche

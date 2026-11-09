@@ -375,7 +375,7 @@
           "type": "string"
         },
         "points": {
-          "description": "3 à 8 lignes, une idée par ligne",
+          "description": "3 à 8 phrases complètes, qu'on pourrait dire à voix haute à l'oral",
           "items": {
             "type": "string"
           },

@@ -41,6 +41,13 @@ class Gabarit(BaseModel):
     ordre: list[str] = Field(description="Ordre conseillé des types de blocs dans une section")
     max_blocs_par_section: int = 7
     max_texte_par_section: int = 1
+    fin_de_chapitre: list[str] = Field(
+        default_factory=lambda: ["essentiel", "autotest"],
+        description="Blocs réservés à la dernière unité de chaque chapitre, et obligatoires là",
+    )
+    voix: str = Field(
+        default="", description="Comment on écrit dans cette filière, en plus de la charte"
+    )
     plan: str = Field(description="Consignes pour l'appel plan : ce que la fiche doit faire voir")
     redaction: str = Field(
         description="Consignes pour l'appel blocs : comment remplir chaque forme"
@@ -52,6 +59,11 @@ class Gabarit(BaseModel):
         unknown = [t for t in self.ordre if t not in allowed]
         if unknown:
             raise ValueError(f"{self.id} : ordre cite des blocs non autorisés : {unknown}")
+        outside = [t for t in self.fin_de_chapitre if t not in allowed]
+        if outside:
+            raise ValueError(
+                f"{self.id} : fin_de_chapitre cite des blocs non autorisés : {outside}"
+            )
         if len(set(allowed)) != len(allowed):
             raise ValueError(f"{self.id} : un type de bloc est répété")
         return self

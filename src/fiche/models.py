@@ -166,7 +166,9 @@ class EssentielBloc(BaseModel):
 
     type: Literal["essentiel"]
     titre: str
-    points: list[str] = Field(description="3 à 8 lignes, une idée par ligne")
+    points: list[str] = Field(
+        description="3 à 8 phrases complètes, qu'on pourrait dire à voix haute à l'oral"
+    )
     passages: Refs
 
 
@@ -238,7 +240,9 @@ def bloc_as_text(bloc: Bloc) -> str:
 
 class PlanSection(BaseModel):
     section: int = Field(description="Numéro de la section, tel que donné")
-    titre: str = Field(description="Titre de la section dans la fiche, court et parlant")
+    titre: str = Field(
+        description="Titre qui dit l'idée de la section ou nomme la notion, sans deux-points"
+    )
     blocs: list[BlockKind] = Field(description="Les types de blocs à produire, dans l'ordre")
     consigne: str = Field(
         description="Ce que chaque bloc doit contenir et mettre en avant, en 1 à 3 phrases ; "

@@ -199,19 +199,20 @@ def default_blocs(user: str) -> SectionBlocs:
 
 
 def default_plan(user: str) -> FichePlan:
-    numbers = [int(m) for m in re.findall(r"^\[(\d+)\]", user, flags=re.M)]
+    heads = re.findall(r"^\[(\d+)\](.*)$", user, flags=re.M)
     return FichePlan(
         titre="Mécanique des fluides, l'essentiel",
         accroche="Deux phrases d'accroche.",
         fil_conducteur="Du fluide parfait au fluide réel.",
         sections=[
             PlanSection(
-                section=i,
-                titre=f"Unité {i}",
-                blocs=["definition", "encadre", "tableau", "essentiel"],
+                section=int(number),
+                titre=f"Unité {number}",
+                blocs=["definition", "encadre", "tableau"]
+                + (["essentiel", "autotest"] if "FIN DE CHAPITRE" in rest else []),
                 consigne="Encadrer la formule de la pression.",
             )
-            for i in numbers
+            for number, rest in heads
         ],
     )
 
