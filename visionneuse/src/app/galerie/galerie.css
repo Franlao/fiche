@@ -1,0 +1,40 @@
+.galerie {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 36px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px));
+  display: grid;
+  gap: 30px;
+}
+.intro { display: grid; gap: 10px; text-align: center; justify-items: center; }
+.intro h1 { font-weight: 800; font-size: clamp(30px, 4.6vw, 44px); letter-spacing: -0.02em; }
+.intro h2 { font-weight: 800; font-size: clamp(24px, 3.4vw, 32px); letter-spacing: -0.02em; }
+.mises { display: grid; gap: 28px; margin-top: 36px; padding-top: 40px; border-top: 1px solid var(--line); }
+.grille.large { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.feuille.portrait { aspect-ratio: 3 / 4; }
+.feuille.portrait iframe { width: 1000px; height: 1334px; }
+.intro p { color: var(--soft); max-width: 42em; }
+.message { text-align: center; color: var(--soft); }
+
+.grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 32px 24px; }
+.vignette { display: grid; gap: 8px; text-decoration: none; }
+.feuille {
+  position: relative; aspect-ratio: 210 / 297; border-radius: 10px; overflow: hidden; background: var(--panel);
+  box-shadow: 0 1px 2px rgba(20, 24, 32, .08), 0 8px 24px rgba(20, 24, 32, .10);
+  transition: transform .25s cubic-bezier(.2, .8, .2, 1), box-shadow .25s;
+}
+.feuille iframe {
+  position: absolute; top: 0; left: 0; width: 860px; height: 1216px; border: 0;
+  transform-origin: 0 0; pointer-events: none;
+}
+.vignette:hover .feuille, .vignette:focus-visible .feuille {
+  transform: translateY(-4px);
+  box-shadow: 0 2px 4px rgba(20, 24, 32, .08), 0 16px 36px rgba(20, 24, 32, .16);
+}
+.vignette:focus-visible { outline: none; }
+.vignette:focus-visible .feuille { outline: 3px solid var(--accent); outline-offset: 3px; }
+.nom { font-family: var(--head); font-weight: 700; font-size: 17px; margin-top: 4px; }
+.ex { color: var(--soft); font-size: 14.5px; margin-top: -4px; }
+.nom .etat { display: inline-block; vertical-align: 2px; margin-left: 8px; }
+.pastille { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--fam); margin-right: 8px; vertical-align: 1px; }
+
+@media (prefers-reduced-motion: reduce) { .feuille { transition: none; } }

@@ -1,0 +1,121 @@
+@let f = famille();
+@let g = f.gabarit;
+
+<div class="tete">
+  <span class="sur">Gabarit{{ g?.version ? ' · version ' + g?.version : '' }}</span>
+  <h2>{{ f.nom }}</h2>
+  <p class="exemple">Exemple : {{ f.matiere }}, « {{ f.titre }} »</p>
+</div>
+
+@if (g?.pour_etudiant) {
+  <section>
+    <h3>Ce que lit l'étudiant</h3>
+    <p>{{ g?.pour_etudiant }}</p>
+  </section>
+}
+
+<section>
+  <h3>Ce qu'il met en avant</h3>
+  <ul>
+    @for (point of f.points; track $index) {
+      <li>{{ point }}</li>
+    }
+  </ul>
+</section>
+
+<section>
+  <h3>Dosage</h3>
+  <dl class="dosage">
+    @for (axe of axes(); track axe; let i = $index) {
+      <dt>{{ axe }}</dt>
+      <dd [attr.aria-label]="f.dosage[i] + ' sur 5'" [title]="f.dosage[i] + ' sur 5'">
+        <i [style.width.%]="f.dosage[i] * 20"></i>
+      </dd>
+    }
+  </dl>
+</section>
+
+@if (g) {
+  @if (g.filieres?.length) {
+    <section>
+      <h3>Filières</h3>
+      <div class="puces">
+        @for (filiere of g.filieres; track $index) {
+          <span>{{ filiere }}</span>
+        }
+      </div>
+    </section>
+  }
+
+  @if (g.ordre?.length) {
+    <section>
+      <h3>Ordre dans une section</h3>
+      <ol class="ordre">
+        @for (type of g.ordre; track $index) {
+          <li>{{ type | libelleBloc }}</li>
+        }
+      </ol>
+    </section>
+  }
+
+  <section>
+    <h3>Règles</h3>
+    <ul>
+      @if (g.max_blocs_par_section) {
+        <li>{{ g.max_blocs_par_section }} blocs au plus par section</li>
+      }
+      @if (g.max_texte_par_section !== null) {
+        <li>{{ g.max_texte_par_section }} bloc de texte au plus par section</li>
+      }
+      @if (finDeChapitre(); as fin) {
+        <li>En fin de chapitre : {{ fin }}</li>
+      }
+    </ul>
+  </section>
+
+  <details open>
+    <summary>Blocs permis ({{ g.blocs?.length ?? 0 }})</summary>
+    <div class="blocs">
+      @for (bloc of g.blocs ?? []; track bloc.type) {
+        <div>
+          <b
+            >{{ bloc.type | libelleBloc }}<small>{{ bloc.type }}</small></b
+          >
+          <p>{{ bloc.usage }}</p>
+        </div>
+      }
+    </div>
+  </details>
+
+  @if (g.ton || g.voix) {
+    <details>
+      <summary>Ton et voix</summary>
+      <div class="style">
+        @if (g.ton) {
+          <p><b>Ton : </b>{{ g.ton }}</p>
+        }
+        @if (g.voix) {
+          <p><b>Voix : </b>{{ g.voix }}</p>
+        }
+      </div>
+    </details>
+  }
+} @else {
+  <p class="manque">
+    Pas encore de gabarit YAML pour cette famille : seul l'aperçu existe. Les blocs permis, l'ordre
+    et le ton apparaîtront ici une fois le fichier écrit.
+  </p>
+}
+
+<section>
+  <h3>Fichiers</h3>
+  <div class="fichiers">
+    <span
+      >Contenu de l'aperçu : <code>apercus/pages/{{ f.id }}.html</code></span
+    >
+    <span>En-tête et dosage : <code>apercus/build.py</code></span>
+    <span>
+      Gabarit : <code>src/fiche/familles/{{ f.id }}.yaml</code>{{ g ? '' : ' (à écrire)' }}
+    </span>
+  </div>
+</section>

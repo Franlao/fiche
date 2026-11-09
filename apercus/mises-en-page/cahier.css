@@ -1,0 +1,163 @@
+/* Mise en page « Cahier ». Une feuille de papier étroite, du serif, de grandes marges, presque
+   pas de couleur : une encre rouge sombre pour les numéros, les appels et ce qui est faux. Les
+   blocs ne sont pas des cartes mais des passages séparés par des filets, comme dans un livre.
+   Les repères de page vivent dans la marge. Pour lire d'un trait : lettres, droit, histoire. */
+:root {
+  --ground: #efebe1; --paper: #fdfbf5; --ink: #22211d; --soft: #6b675d; --rule: #d6cfbf; --faint: #f1ede3;
+  --accent: #8a1c1c; --box: #f1ede3; --alert: #8a1c1c; --alert-soft: #f4e9e3;
+  --text: "Literata", "Iowan Old Style", Georgia, serif;
+  --head: "Literata", "Iowan Old Style", Georgia, serif;
+  --code: "JetBrains Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #171613; --paper: #211f1a; --ink: #ebe6da; --soft: #a69f8f; --rule: #3b3830; --faint: #2a2822;
+    --accent: #e39a8c; --box: #2a2822; --alert: #e39a8c; --alert-soft: #332520; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #171613; --paper: #211f1a; --ink: #ebe6da; --soft: #a69f8f; --rule: #3b3830; --faint: #2a2822;
+  --accent: #e39a8c; --box: #2a2822; --alert: #e39a8c; --alert-soft: #332520; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--ground); color: var(--ink); font-family: var(--text);
+  font-size: 16.5px; line-height: 1.65; font-variant-numeric: oldstyle-nums;
+  padding: 24px max(12px, env(safe-area-inset-right, 0px)) 56px max(12px, env(safe-area-inset-left, 0px));
+}
+::selection { background: var(--faint); }
+h1, h2, h3, h4 { font-family: var(--head); margin: 0; line-height: 1.2; text-wrap: balance; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+code { font-family: var(--code); font-size: 0.85em; }
+
+main {
+  max-width: 660px; margin: 0 auto; background: var(--paper); padding: 48px 72px 64px;
+  box-shadow: 0 0 0 1px var(--rule), 0 12px 40px rgba(40, 30, 10, .08);
+}
+@media (max-width: 700px) { main { padding: 28px 20px 48px; } }
+
+.haut { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--soft); padding-bottom: 28px; font-style: italic; }
+.haut a { color: var(--soft); }
+.integre .haut { display: none; }
+
+/* Titre : centré, filet, comme une page de chapitre */
+.titre { text-align: center; display: grid; gap: 10px; justify-items: center; padding-bottom: 26px; margin-bottom: 36px; border-bottom: 1px solid var(--rule); }
+.titre .cours { font-variant: small-caps; letter-spacing: .16em; font-size: 14px; color: var(--soft); }
+.titre h1 { font-size: clamp(28px, 4.4vw, 36px); letter-spacing: -0.005em; }
+.titre .accroche { font-style: italic; font-size: 17px; line-height: 1.5; color: var(--soft); max-width: 32em; }
+
+h2.partie { font-size: 21px; margin: 0 0 22px; display: flex; gap: 12px; align-items: baseline; }
+h2.partie .n { font-style: italic; font-weight: 400; color: var(--accent); font-size: 17px; white-space: nowrap; }
+h2.partie .n::before { content: "§ "; }
+
+/* Les repères de page dans la marge de gauche */
+.bloc { position: relative; margin: 0 0 28px; display: grid; gap: 8px; min-width: 0; }
+.page { position: absolute; left: -62px; top: 4px; width: 48px; text-align: right; font-size: 13px; font-style: italic; color: var(--soft); }
+@media (max-width: 700px) { .page { position: static; width: auto; text-align: left; order: 20; } }
+
+h3 { font-size: 17px; }
+
+/* Schémas : des planches entre deux filets, légende en italique */
+.schema { margin: 0 0 30px; padding: 18px 0 12px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); display: grid; gap: 10px; }
+.schema > svg { display: block; width: 100%; height: auto; color: var(--ink); }
+.schema figcaption { font-size: 14px; font-style: italic; color: var(--soft); text-align: center; }
+.legende-toggle { display: flex; gap: 8px; align-items: center; font-size: 13.5px; font-style: italic; color: var(--soft); cursor: pointer; width: fit-content; justify-self: end; }
+.legende-toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
+.lbl-trou { opacity: 0; }
+.legendable:has(.legende-toggle input:checked) .lbl { opacity: 0; }
+.legendable:has(.legende-toggle input:checked) .lbl-trou { opacity: 1; }
+.lbl, .lbl-trou { transition: opacity .2s ease-out; }
+.schema + .schema { border-top: 0; padding-top: 6px; margin-top: -30px; }
+
+/* Les cartes d'attention deviennent deux colonnes de texte, séparées par un filet */
+.cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px 28px; margin: 0 0 28px; }
+.focus { display: grid; gap: 8px; align-content: start; }
+.focus + .focus { border-left: 1px solid var(--rule); padding-left: 28px; }
+@media (max-width: 520px) { .focus + .focus { border-left: 0; padding-left: 0; border-top: 1px solid var(--rule); padding-top: 16px; } }
+.focus > h3 { font-variant: small-caps; letter-spacing: .1em; font-size: 15px; color: var(--accent); }
+.focus ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+dl.chiffres { margin: 0; display: grid; gap: 12px; }
+dl.chiffres div { display: grid; gap: 0; }
+dl.chiffres dt { font-size: 14px; color: var(--soft); font-style: italic; order: 2; }
+dl.chiffres dd { margin: 0; font-size: 24px; font-weight: 700; line-height: 1.15; order: 1; }
+
+/* Tableaux à la manière des livres : trois filets horizontaux, aucun vertical */
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+caption { caption-side: top; text-align: left; font-style: italic; padding-bottom: 8px; }
+thead th { border-top: 1.5px solid var(--ink); border-bottom: 1px solid var(--ink); text-align: left; padding: 8px 10px; font-weight: 700; vertical-align: bottom; }
+td, tbody th { padding: 7px 10px; text-align: left; vertical-align: top; }
+tbody th { font-weight: 700; }
+tbody tr:last-child td, tbody tr:last-child th { border-bottom: 1.5px solid var(--ink); }
+
+/* Le piège : une remarque, pas une bulle. « Faux » en petites capitales rouges. */
+.piege { gap: 8px; }
+.idee-recue { display: grid; gap: 2px; }
+.idee-recue .qui { font-size: 13.5px; font-style: italic; color: var(--soft); }
+.idee-recue q { font-size: 17px; quotes: "« " " »"; }
+.idee-recue .faux { font-variant: small-caps; letter-spacing: .12em; font-weight: 700; color: var(--alert); font-size: 15px; }
+.en-realite b { color: var(--accent); font-weight: 700; }
+
+/* L'essentiel : entre deux filets doubles, titre en petites capitales centré */
+.essentiel { margin: 40px 0 0; padding: 18px 0 16px; border-top: 3px double var(--ink); border-bottom: 3px double var(--ink); display: grid; gap: 12px; }
+.essentiel h3 { text-align: center; font-variant: small-caps; letter-spacing: .14em; font-size: 15px; font-weight: 700; }
+.essentiel ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.essentiel li::marker { color: var(--accent); }
+
+footer.apercu { margin-top: 44px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--soft); display: grid; gap: 6px; }
+footer.apercu h2 { font-size: 15px; color: var(--ink); }
+footer.apercu ul { margin: 0; padding-left: 18px; display: grid; gap: 2px; }
+
+/* Les autres blocs du catalogue, dans la même manière : filets, italiques, petites capitales */
+.runin { font-weight: 700; }
+.runin .num { font-style: italic; font-weight: 400; color: var(--accent); }
+.doux { color: var(--soft); font-size: 15px; }
+p.cat { font-style: italic; margin: -16px 0 16px; }
+h2.partie small { font-style: italic; font-weight: 400; font-size: 14px; color: var(--soft); margin-left: 10px; }
+.texte p + p { margin-top: 10px; }
+.focus.bloc { padding: 14px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.focus .gros { font-size: 18px; }
+.focus .ref, .portee { font-size: 14px; color: var(--soft); font-style: italic; }
+.focus .ref + .ref { margin-top: -4px; }
+.limites b { color: var(--alert); font-style: normal; }
+dl.variables { margin: 0; display: flex; flex-wrap: wrap; gap: 2px 18px; font-size: 14.5px; }
+dl.variables div { display: flex; gap: 6px; } dl.variables dt { font-weight: 700; } dl.variables dd { margin: 0; color: var(--soft); }
+.modele { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; }
+.modele > div { padding: 8px 0; border-top: 1px solid var(--rule); }
+.modele h4 { font-variant: small-caps; letter-spacing: .08em; font-size: 15px; color: var(--accent); font-weight: 700; }
+.modele ul { margin: 4px 0 0; padding-left: 18px; }
+@media (max-width: 520px) { .modele { grid-template-columns: minmax(0, 1fr); } }
+ol.etapes { margin: 0; padding: 0; list-style: none; counter-reset: e; display: grid; gap: 10px; }
+ol.etapes li { counter-increment: e; display: grid; grid-template-columns: 32px minmax(0, 1fr); }
+ol.etapes li::before { content: counter(e) "."; font-style: italic; color: var(--accent); font-size: 18px; }
+ol.frise { margin: 0; padding: 0; list-style: none; display: grid; }
+ol.frise li { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 16px; padding: 5px 0; border-bottom: 1px dotted var(--rule); }
+ol.frise time { font-style: italic; text-align: right; color: var(--accent); }
+dl.decision { margin: 0; display: grid; gap: 6px; }
+dl.decision div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; padding: 6px 0; border-bottom: 1px dotted var(--rule); }
+dl.decision dt::before { content: "Si "; font-style: italic; color: var(--accent); }
+dl.decision dd { margin: 0; } dl.decision dd::before { content: "alors "; font-style: italic; color: var(--accent); }
+dl.syllogisme { margin: 0; display: grid; gap: 8px; }
+dl.syllogisme div { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 14px; }
+dl.syllogisme dt { font-variant: small-caps; letter-spacing: .06em; font-weight: 700; color: var(--accent); }
+dl.syllogisme dd { margin: 0; }
+.teste details { padding: 8px 0; border-bottom: 1px dotted var(--rule); }
+.teste summary { cursor: pointer; font-weight: 700; } .teste summary::marker { color: var(--accent); }
+.teste details p { padding-top: 6px; color: var(--soft); font-style: italic; }
+blockquote.article { margin: 0; font-size: 18px; line-height: 1.5; font-style: italic; }
+blockquote.article::before { content: "« "; color: var(--accent); } blockquote.article::after { content: " »"; color: var(--accent); }
+pre.code { margin: 0; overflow-x: auto; padding: 10px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); font-family: var(--code); font-size: 13.5px; line-height: 1.6; counter-reset: l; }
+pre.code span.l { display: block; counter-increment: l; white-space: pre; }
+pre.code span.l::before { content: counter(l); display: inline-block; width: 32px; padding-right: 12px; text-align: right; color: var(--soft); }
+pre.code b { font-weight: 500; color: var(--accent); } pre.code i { font-style: normal; color: var(--soft); }
+table.trace { font-variant-numeric: tabular-nums; }
+
+/* Catalogue des blocs */
+.entree > header { display: grid; gap: 4px; margin-bottom: 14px; }
+.entree > header h2.partie { margin: 0; }
+.entree > header p.cat { margin: 0; }

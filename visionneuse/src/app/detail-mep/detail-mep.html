@@ -1,0 +1,122 @@
+<header class="barre">
+  <a class="marque" routerLink="/">Gabarits <span class="long">de fiche</span></a>
+  <span class="espace"></span>
+  <a class="bouton" routerLink="/" title="Retour à la galerie (Échap)">
+    ← <span class="long">Tous les gabarits</span>
+  </a>
+  @if (precedente(); as p) {
+    <a
+      class="bouton icone"
+      [routerLink]="['/mise-en-page', p.id]"
+      [title]="'Précédente : ' + p.nom + ' (flèche gauche)'"
+      aria-label="Mise en page précédente"
+      >‹</a
+    >
+  }
+  @if (suivante(); as s) {
+    <a
+      class="bouton icone"
+      [routerLink]="['/mise-en-page', s.id]"
+      [title]="'Suivante : ' + s.nom + ' (flèche droite)'"
+      aria-label="Mise en page suivante"
+      >›</a
+    >
+  }
+  <div class="choix facultatif" role="group" aria-label="Largeur de l'aperçu">
+    @for (option of largeurs; track option.valeur) {
+      <button
+        type="button"
+        [attr.aria-pressed]="prefs.largeur() === option.valeur"
+        (click)="prefs.largeur.set(option.valeur)"
+      >
+        {{ option.libelle }}
+      </button>
+    }
+  </div>
+  <button
+    class="bouton icone facultatif"
+    type="button"
+    (click)="recharger()"
+    title="Recharger l'aperçu après une construction"
+    aria-label="Recharger l'aperçu"
+  >
+    ↻
+  </button>
+  <a
+    class="bouton icone facultatif"
+    [href]="lienSeul()"
+    target="_blank"
+    rel="noopener"
+    title="Ouvrir la fiche seule dans un onglet"
+    aria-label="Ouvrir la fiche seule"
+    >↗</a
+  >
+  <app-theme-choix />
+</header>
+
+@if (mise(); as m) {
+  <div class="detail">
+    <nav class="liste" aria-label="Mises en page">
+      @for (autre of catalogue.misesEnPage(); track autre.id) {
+        <a
+          [routerLink]="['/mise-en-page', autre.id]"
+          routerLinkActive="actif"
+          ariaCurrentWhenActive="page"
+        >
+          {{ autre.nom }}
+        </a>
+      }
+    </nav>
+
+    <div class="scene">
+      <div class="cadre" [class.telephone]="prefs.largeur() === 'telephone'">
+        <iframe
+          [appCadre]="m.id | lienApercu: prefs.theme() : recharge() : dossierMep"
+          [title]="'Fiche rendue par la mise en page ' + m.nom"
+        ></iframe>
+      </div>
+    </div>
+
+    <aside class="desc mep" aria-label="Description de la mise en page">
+      <div class="tete">
+        <span class="sur">Mise en page</span>
+        <h2>{{ m.nom }}</h2>
+        <p class="exemple">{{ m.resume }}</p>
+      </div>
+      <section>
+        <h3>Ce qui la caractérise</h3>
+        <ul>
+          @for (point of m.points; track $index) {
+            <li>{{ point }}</li>
+          }
+        </ul>
+      </section>
+      @if (contenu(); as c) {
+        <section>
+          <h3>Contenu d'essai</h3>
+          <p>
+            {{ c.matiere }}, « {{ c.titre }} », le même pour toutes les mises en page.
+            <a [routerLink]="['/gabarit', c.id]">Voir ce contenu dans son gabarit</a>.
+          </p>
+        </section>
+      }
+      <section>
+        <h3>Fichiers</h3>
+        <div class="fichiers">
+          <span
+            >Feuille de style : <code>apercus/mises-en-page/{{ m.id }}.css</code></span
+          >
+          <span
+            >Fiche rendue : <code>apercus/mep/{{ m.id }}.html</code></span
+          >
+          <span>Description : <code>apercus/build.py</code>, liste <code>MISES_EN_PAGE</code></span>
+        </div>
+      </section>
+    </aside>
+  </div>
+} @else if (catalogue.statut() === 'erreur') {
+  <p class="message">
+    Impossible de lire <code>apercus/gabarits.json</code>. Lance
+    <code>uv run python apercus/build.py</code> à la racine du dépôt.
+  </p>
+}

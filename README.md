@@ -60,6 +60,23 @@ exemple tiré d'un cours. Familles présentes : `sciences-formelles`, `vivant-sa
 validation sur deux cas : droit et sciences humaines, économie et gestion, informatique et
 technique.
 
+## Visionneuse des gabarits
+
+`apercus/` contient une fiche d'aperçu écrite à la main pour chaque famille, et
+`visionneuse/` une application Angular pour les parcourir : la galerie, puis chaque gabarit
+avec sa fiche réelle et sa description. Après `uv run python apercus/build.py`, lancer
+`npm start` dans `visionneuse/` (détails dans `visionneuse/README.md`).
+
+Les gabarits ont deux axes. Le **gabarit de filière** (YAML) dit quels blocs la fiche contient
+et comment on y écrit. La **mise en page** (`apercus/mises-en-page/*.css`) dit à quoi ils
+ressemblent : trois prototypes, Cahier, Poster et Cartes, s'appliquent à un même contenu pour
+qu'on voie ce qui les distingue (`apercus/mises-en-page.html`, ou la visionneuse).
+
+Les blocs eux-mêmes sont en cours de refonte (décision 2, `docs/decisions/`) : le catalogue
+des quatorze blocs est visible dans `apercus/blocs.html`, et le répertoire des vingt-trois
+formes de schémas que le code sait dessiner dans `apercus/schemas.html` (dessinées par
+`apercus/dessins.py`, décrites dans `docs/schemas/repertoire.md`).
+
 ## Qualité
 
 `uv run ruff check src tests`, `uv run mypy`, `uv run pytest --cov` (sans réseau, faux modèle).

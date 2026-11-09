@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mises en page, même contenu</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@600;700;800&family=Atkinson+Hyperlegible+Next:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root { --ground: #f4f5f7; --ink: #1b1d22; --soft: #5a606d; --page: #fff; --accent: #2346b8;
+  --head: "Schibsted Grotesk", "Segoe UI", sans-serif; --text: "Atkinson Hyperlegible Next", "Segoe UI", system-ui, sans-serif; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ground: #121417; --ink: #e8e9ec; --soft: #a9aebb; --page: #1b1e23; --accent: #93a9ff; color-scheme: dark; } }
+:root[data-theme="dark"] { --ground: #121417; --ink: #e8e9ec; --soft: #a9aebb; --page: #1b1e23; --accent: #93a9ff; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--text); font-size: 16px; line-height: 1.5; padding: 40px 16px 64px; }
+main { max-width: 1280px; margin: 0 auto; display: grid; gap: 36px; }
+header { display: grid; gap: 10px; text-align: center; justify-items: center; }
+h1 { font-family: var(--head); font-weight: 800; font-size: clamp(30px, 4.6vw, 44px); letter-spacing: -0.02em; margin: 0; }
+header p { color: var(--soft); max-width: 44em; margin: 0; }
+header a { color: var(--accent); }
+.grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 32px 28px; align-items: start; }
+.mep { display: grid; gap: 8px; }
+.feuille { position: relative; display: block; aspect-ratio: 3 / 4; border-radius: 10px; overflow: hidden; background: var(--page);
+  box-shadow: 0 1px 2px rgba(20, 24, 32, .08), 0 8px 24px rgba(20, 24, 32, .10); }
+.feuille iframe { position: absolute; top: 0; left: 0; width: 1000px; height: 1334px; border: 0; transform-origin: 0 0; pointer-events: none; }
+.mep h2 { font-family: var(--head); font-weight: 800; font-size: 22px; margin: 8px 0 0; }
+.mep p { margin: 0; }
+.mep ul { margin: 0; padding-left: 18px; color: var(--soft); font-size: 14.5px; display: grid; gap: 2px; }
+.ouvrir { color: var(--accent); font-weight: 700; justify-self: start; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Un même cours, trois mises en page</h1>
+    <p>Le contenu est identique dans les trois colonnes : même titre, mêmes schémas, même tableau, même piège. Seule la feuille de style change. C'est ainsi qu'on voit ce qu'une mise en page apporte. <a href="index.html">Retour aux gabarits</a></p>
+  </header>
+  <div class="grille">
+    <section class="mep">
+      <a class="feuille" href="mep/cahier.html" aria-label="Ouvrir la mise en page Cahier"><iframe src="mep/cahier.html" title="Mise en page Cahier" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true"></iframe></a>
+      <h2>Cahier</h2>
+      <p>Une feuille étroite, du serif, de grandes marges, presque pas de couleur. Pour lire d'un trait.</p>
+      <ul><li>Les blocs sont des passages séparés par des filets, pas des cartes.</li><li>Les repères de page dans la marge, les tableaux à trois filets comme dans un livre.</li><li>L'essentiel entre deux filets doubles, le piège en remarque avec « faux » en petites capitales.</li></ul>
+      <a class="ouvrir" href="mep/cahier.html">Ouvrir en entier</a>
+    </section>
+    <section class="mep">
+      <a class="feuille" href="mep/poster.html" aria-label="Ouvrir la mise en page Poster"><iframe src="mep/poster.html" title="Mise en page Poster" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true"></iframe></a>
+      <h2>Poster</h2>
+      <p>Deux colonnes denses, chaque bloc dans une boîte titrée, un bandeau de couleur. Tout d'un seul regard.</p>
+      <ul><li>Le titre en bandeau plein, la section soulignée d'un trait.</li><li>Chaque boîte porte son titre en lettres capitales avec un carré de couleur.</li><li>Le piège en boîte d'alerte rouge, l'essentiel en boîte finale sur deux colonnes.</li></ul>
+      <a class="ouvrir" href="mep/poster.html">Ouvrir en entier</a>
+    </section>
+    <section class="mep">
+      <a class="feuille" href="mep/cartes.html" aria-label="Ouvrir la mise en page Cartes"><iframe src="mep/cartes.html" title="Mise en page Cartes" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true"></iframe></a>
+      <h2>Cartes</h2>
+      <p>Un fond gris et des cartes blanches sur une grille : on pioche dans l'ordre qu'on veut.</p>
+      <ul><li>Chaque carte porte une étiquette : schéma, tableau, piège.</li><li>Les chiffres en très gros, le piège sur une carte teintée, l'essentiel sur une carte sombre numérotée.</li><li>Typographie géométrique, grands titres.</li></ul>
+      <a class="ouvrir" href="mep/cartes.html">Ouvrir en entier</a>
+    </section>
+  </div>
+</main>
+<script>
+  const fit = () => document.querySelectorAll(".feuille").forEach((p) => {
+    const f = p.querySelector("iframe");
+    if (f) f.style.transform = `scale(${p.clientWidth / 1000})`;
+  });
+  try { new ResizeObserver(fit).observe(document.querySelector(".grille")); } catch (e) { window.addEventListener("resize", fit); }
+  fit();
+</script>
+</body>
+</html>

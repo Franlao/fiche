@@ -1,0 +1,93 @@
+<header class="barre">
+  <a class="marque" routerLink="/">Gabarits de fiche</a>
+  <span class="espace"></span>
+  <app-theme-choix />
+</header>
+
+<main class="galerie">
+  <header class="intro">
+    <h1>Gabarits de fiche</h1>
+    <p>
+      Une façon de présenter une fiche pour chaque famille de filières, avec son dosage de schémas,
+      de tableaux et de texte et ses cartes d’attention. Les contenus sont inventés. Ouvre un
+      gabarit pour voir la fiche entière à côté de sa description. Les briques communes sont dans le
+      <a href="apercus/blocs.html" target="_blank" rel="noopener">catalogue des blocs</a>, les
+      schémas dessinables dans le
+      <a href="apercus/schemas.html" target="_blank" rel="noopener">répertoire des schémas</a>.
+    </p>
+  </header>
+
+  @switch (catalogue.statut()) {
+    @case ('chargement') {
+      <p class="message">Lecture des gabarits…</p>
+    }
+    @case ('erreur') {
+      <p class="message">
+        Impossible de lire <code>apercus/gabarits.json</code>. Lance
+        <code>uv run python apercus/build.py</code> à la racine du dépôt, puis recharge la page.
+      </p>
+    }
+    @default {
+      <div class="grille">
+        @for (f of catalogue.familles(); track f.id) {
+          <a class="vignette" [routerLink]="['/gabarit', f.id]" [style.--fam]="f.accent">
+            <div class="feuille" appAjusterPage>
+              <iframe
+                [appCadre]="f.id | lienApercu: prefs.theme()"
+                [title]="'Aperçu ' + f.nom"
+                loading="lazy"
+                scrolling="no"
+                tabindex="-1"
+                aria-hidden="true"
+              ></iframe>
+            </div>
+            <span class="nom">
+              <span class="pastille" aria-hidden="true"></span>{{ f.nom }}
+              @if (f.gabarit) {
+                <span class="etat ecrit" title="Le gabarit YAML existe dans src/fiche/familles/">
+                  gabarit écrit
+                </span>
+              } @else {
+                <span class="etat" title="Seul l'aperçu existe, pas encore de gabarit YAML">
+                  aperçu seul
+                </span>
+              }
+            </span>
+            <span class="ex">{{ f.matiere }} · {{ f.titre }}</span>
+          </a>
+        }
+      </div>
+
+      @if (catalogue.misesEnPage().length) {
+        <section class="mises" aria-labelledby="titre-mises">
+          <header class="intro">
+            <h2 id="titre-mises">Un même cours, plusieurs mises en page</h2>
+            <p>
+              Le gabarit dit quels blocs la fiche contient ; la mise en page dit à quoi ils
+              ressemblent. Ici le contenu est identique d’une colonne à l’autre : seule la feuille
+              de style change.
+            </p>
+          </header>
+          <div class="grille large">
+            @for (m of catalogue.misesEnPage(); track m.id) {
+              <a class="vignette" [routerLink]="['/mise-en-page', m.id]">
+                <div class="feuille portrait" appAjusterPage>
+                  <iframe
+                    [appCadre]="m.id | lienApercu: prefs.theme() : 0 : dossierMep"
+                    [title]="'Mise en page ' + m.nom"
+                    loading="lazy"
+                    scrolling="no"
+                    tabindex="-1"
+                    aria-hidden="true"
+                  ></iframe>
+                </div>
+                <span class="nom">{{ m.nom }}</span>
+                <span class="ex">{{ m.resume }}</span>
+              </a>
+            }
+          </div>
+        </section>
+      }
+    }
+  }
+</main>

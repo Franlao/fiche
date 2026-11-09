@@ -1,0 +1,34 @@
+:host { display: grid; align-content: start; gap: 22px; }
+
+.tete { display: grid; gap: 6px; }
+.sur { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--fam); font-weight: 700; }
+h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.01em; }
+.exemple { color: var(--soft); font-size: 14.5px; }
+
+section { display: grid; gap: 8px; }
+h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--soft); font-weight: 700; }
+section > p { font-size: 15px; }
+ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+
+.dosage { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 14px; align-items: center; font-size: 14px; }
+.dosage dt { color: var(--soft); }
+.dosage dd { margin: 0; height: 8px; border-radius: 999px; background: var(--chip); overflow: hidden; }
+.dosage dd i { display: block; height: 100%; border-radius: 999px; background: var(--fam); }
+
+.puces { display: flex; flex-wrap: wrap; gap: 6px; }
+.puces span { font-size: 13px; padding: 3px 10px; border-radius: 999px; background: var(--chip); }
+
+.ordre { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; font-size: 13.5px; }
+.ordre li { position: relative; padding: 3px 10px; border-radius: 6px; background: var(--chip); }
+.ordre li + li::before { content: "›"; position: absolute; left: -11px; color: var(--soft); }
+
+details { border-top: 1px solid var(--line); padding-top: 12px; }
+summary { cursor: pointer; font-weight: 700; font-size: 15px; }
+.blocs, .style { margin-top: 10px; display: grid; gap: 10px; font-size: 14.5px; }
+.blocs div { display: grid; gap: 2px; }
+.blocs b { font-family: var(--head); }
+.blocs small { font-family: var(--code); font-weight: 500; color: var(--soft); font-size: 12px; margin-left: 6px; }
+.blocs p { color: var(--soft); }
+
+.manque { padding: 12px 14px; border-radius: 10px; background: var(--chip); font-size: 14.5px; color: var(--soft); }
+.fichiers { display: grid; gap: 6px; font-size: 14px; color: var(--soft); }

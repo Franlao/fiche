@@ -1,0 +1,87 @@
+<header class="barre">
+  <a class="marque" routerLink="/">Gabarits <span class="long">de fiche</span></a>
+  <span class="espace"></span>
+  <a class="bouton" routerLink="/" title="Retour à la galerie (Échap)">
+    ← <span class="long">Tous les gabarits</span>
+  </a>
+  @if (precedente(); as p) {
+    <a
+      class="bouton icone"
+      [routerLink]="['/gabarit', p.id]"
+      [title]="'Précédent : ' + p.nom + ' (flèche gauche)'"
+      aria-label="Gabarit précédent"
+      >‹</a
+    >
+  }
+  @if (suivante(); as s) {
+    <a
+      class="bouton icone"
+      [routerLink]="['/gabarit', s.id]"
+      [title]="'Suivant : ' + s.nom + ' (flèche droite)'"
+      aria-label="Gabarit suivant"
+      >›</a
+    >
+  }
+  <div class="choix facultatif" role="group" aria-label="Largeur de l'aperçu">
+    @for (option of largeurs; track option.valeur) {
+      <button
+        type="button"
+        [attr.aria-pressed]="prefs.largeur() === option.valeur"
+        (click)="prefs.largeur.set(option.valeur)"
+      >
+        {{ option.libelle }}
+      </button>
+    }
+  </div>
+  <button
+    class="bouton icone facultatif"
+    type="button"
+    (click)="recharger()"
+    title="Recharger l'aperçu après une construction"
+    aria-label="Recharger l'aperçu"
+  >
+    ↻
+  </button>
+  <a
+    class="bouton icone facultatif"
+    [href]="lienSeul()"
+    target="_blank"
+    rel="noopener"
+    title="Ouvrir la fiche seule dans un onglet"
+    aria-label="Ouvrir la fiche seule"
+    >↗</a
+  >
+  <app-theme-choix />
+</header>
+
+@if (famille(); as f) {
+  <div class="detail">
+    <nav class="liste" #liste aria-label="Gabarits">
+      @for (autre of catalogue.familles(); track autre.id) {
+        <a
+          [routerLink]="['/gabarit', autre.id]"
+          routerLinkActive="actif"
+          ariaCurrentWhenActive="page"
+        >
+          <span class="pastille" [style.background]="autre.accent"></span>{{ autre.nom }}
+        </a>
+      }
+    </nav>
+
+    <div class="scene">
+      <div class="cadre" [class.telephone]="prefs.largeur() === 'telephone'">
+        <iframe
+          [appCadre]="f.id | lienApercu: prefs.theme() : recharge()"
+          [title]="'Aperçu de la fiche ' + f.nom"
+        ></iframe>
+      </div>
+    </div>
+
+    <app-description class="desc" [famille]="f" [axes]="catalogue.axes()" />
+  </div>
+} @else if (catalogue.statut() === 'erreur') {
+  <p class="message">
+    Impossible de lire <code>apercus/gabarits.json</code>. Lance
+    <code>uv run python apercus/build.py</code> à la racine du dépôt.
+  </p>
+}

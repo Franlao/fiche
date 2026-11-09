@@ -1,5 +1,28 @@
 # Journal des versions
 
+## Non publié
+
+- Visionneuse Angular des gabarits (`visionneuse/`) : galerie, fiche réelle à côté de la
+  description du gabarit, navigation au clavier, largeur ordinateur ou téléphone, thème clair
+  ou sombre.
+- `apercus/build.py` écrit `apercus/gabarits.json` (familles, dosage, gabarit YAML quand il
+  existe) ; les fiches d'aperçu suivent `?theme=` et cachent leur barre dans un cadre.
+- Décision 2 proposée (`docs/decisions/02-catalogue-des-blocs-v2.md`) : catalogue des blocs
+  v2, quatorze blocs dont trois nouveaux (citation, code, schéma) et deux enrichis (exemple avec
+  la règle appliquée, encadré avec les limites), à valider avant d'écrire les sept gabarits.
+  Catalogue visible : `apercus/blocs.html` (un exemple de chaque bloc, contenu inventé), rendu
+  aussi dans chaque mise en page (`apercus/mep/blocs-*.html`).
+- Répertoire des schémas : vingt-trois formes classées par ce qu'il y a à montrer (enchaînement,
+  organisation, choix, temps, quantités, comparaison, fonctionnement), chacune dessinée par le
+  code (`apercus/dessins.py`) à partir d'une description, avec « montre bien », « à éviter
+  quand » et « il faut que le cours dise ». Galerie `apercus/schemas.html`, document engendré
+  `docs/schemas/repertoire.md`. Brouillon du moteur de rendu du bloc `schema`.
+- Mises en page, second axe des gabarits : trois feuilles de style complètes (Cahier, Poster,
+  Cartes) appliquées au même contenu, comparées côte à côte (`apercus/mises-en-page.html`) et
+  dans la visionneuse (`/mise-en-page/<id>`). Constat du banc : les neuf gabarits ne se
+  distinguaient que par la couleur ; la mise en page est ce qui change la grille, la police,
+  la densité et le traitement des blocs.
+
 ## 0.2.0 (9 novembre 2026)
 
 - Charte d'écriture (`docs/ecriture.md`) et mesure des tics d'IA (`fiche.ecriture`) ; tirets,

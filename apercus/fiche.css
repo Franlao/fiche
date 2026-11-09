@@ -212,3 +212,33 @@ body.ps .titre .cours, body.la .titre .cours { color: var(--accent); font-family
 body.hi .titre { border-radius: 22px; padding: 28px 30px; background: var(--box); }
 body.le .titre { text-align: center; justify-items: center; }
 body.le .titre .accroche { max-width: 30em; font-size: 20px; }
+
+/* Formes ajoutées par le catalogue des blocs v2 : frise en liste, décision, citation, trace, variables */
+ol.frise { margin: 0; padding: 0; list-style: none; display: grid; gap: 0; position: relative; }
+ol.frise li { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 6px 0 6px 0; position: relative; }
+ol.frise li::before { content: ""; position: absolute; left: 128px; top: 0; bottom: 0; width: 2px; background: var(--box); }
+ol.frise li::after { content: ""; position: absolute; left: 123px; top: 13px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
+ol.frise time { font-family: var(--head); font-weight: 700; color: var(--accent); text-align: right; font-size: 15px; }
+ol.frise span { padding-left: 20px; }
+dl.decision { margin: 0; display: grid; gap: 8px; }
+dl.decision div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; padding: 8px 12px; background: var(--faint); border-radius: 10px; }
+dl.decision dt { font-family: var(--head); font-weight: 700; }
+dl.decision dt::before { content: "si "; color: var(--accent); font-weight: 800; }
+dl.decision dd { margin: 0; }
+dl.decision dd::before { content: "alors "; color: var(--accent); font-family: var(--head); font-weight: 800; }
+@media (max-width: 560px) { dl.decision div { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+.citation blockquote.article { font-size: 19px; }
+.portee { font-size: 15px; }
+dl.variables { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 15px; }
+dl.variables div { display: flex; gap: 6px; }
+dl.variables dt { color: var(--accent); font-weight: 700; }
+dl.variables dd { margin: 0; color: var(--soft); }
+.limites b { color: var(--alert); font-family: var(--head); }
+table.trace { font-size: 14.5px; font-variant-numeric: tabular-nums; }
+h2.partie small { font-family: var(--text); font-weight: 400; font-size: 14px; color: var(--soft); margin-left: 10px; vertical-align: 2px; }
+p.cat { margin: 0; max-width: 42em; }
+.entree > header { display: grid; gap: 6px; margin-bottom: 16px; }
+.entree > header h2.partie { margin: 0; }
+
+/* Dans la visionneuse (index.html), la barre de navigation de la page est en double. */
+.integre .haut { display: none; }

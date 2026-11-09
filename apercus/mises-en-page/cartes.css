@@ -1,0 +1,168 @@
+/* Mise en page « Cartes ». Un fond gris, et chaque bloc est une carte blanche sur une grille :
+   on lit dans l'ordre qu'on veut, comme un jeu de fiches étalées. Chaque carte porte une
+   étiquette (Schéma, Tableau, Piège), l'essentiel est une carte sombre pleine largeur. Grosse
+   typographie géométrique. Pour réviser vite, en piochant. */
+:root {
+  --ground: #edeff3; --card: #ffffff; --ink: #141720; --soft: #626876; --line: #e1e4ea; --faint: #f3f4f7;
+  --accent: #0f766e; --box: #e4f3f0; --dark: #141720; --dark-ink: #f4f5f8; --alert: #c2410c; --alert-soft: #fdf0e8;
+  --text: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --head: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --code: "JetBrains Mono", Consolas, monospace;
+  --ombre: 0 1px 2px rgba(10, 14, 30, .05), 0 8px 24px rgba(10, 14, 30, .07);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0f1115; --card: #1a1d24; --ink: #eceef2; --soft: #9aa1ad; --line: #2b3039; --faint: #22262e;
+    --accent: #5eead4; --box: #163230; --dark: #f4f5f8; --dark-ink: #141720; --alert: #fb923c; --alert-soft: #3a2114;
+    --ombre: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0f1115; --card: #1a1d24; --ink: #eceef2; --soft: #9aa1ad; --line: #2b3039; --faint: #22262e;
+  --accent: #5eead4; --box: #163230; --dark: #f4f5f8; --dark-ink: #141720; --alert: #fb923c; --alert-soft: #3a2114;
+  --ombre: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35); color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--ground); color: var(--ink); font-family: var(--text);
+  font-size: 16px; line-height: 1.55;
+  padding: 20px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px));
+}
+::selection { background: var(--box); }
+h1, h2, h3, h4 { font-family: var(--head); margin: 0; line-height: 1.15; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+code { font-family: var(--code); font-size: 0.86em; }
+
+/* La grille : autant de colonnes de 320 px que la largeur permet ; les schémas en prennent deux */
+main {
+  max-width: 1120px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 16px; grid-auto-flow: dense; align-items: start;
+}
+.haut, .titre, h2.partie, .essentiel, footer.apercu { grid-column: 1 / -1; }
+.cartes { display: contents; }
+@media (min-width: 700px) { .schema { grid-column: span 2; } }
+
+.haut { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 14px; color: var(--soft); }
+.haut a { color: var(--soft); }
+.integre .haut { display: none; }
+
+/* Titre : grand, à nu sur le fond gris, avec la matière en pastille */
+.titre { display: grid; gap: 12px; justify-items: start; padding: 12px 4px 20px; }
+.titre .cours { background: var(--accent); color: var(--card); font-size: 13px; font-weight: 800; letter-spacing: .04em; padding: 4px 12px; border-radius: 999px; }
+.titre h1 { font-size: clamp(34px, 5.2vw, 54px); font-weight: 800; letter-spacing: -0.03em; }
+.titre .accroche { font-size: 18px; line-height: 1.5; color: var(--soft); max-width: 40em; }
+
+h2.partie { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; color: var(--soft); margin: 14px 4px -2px; }
+h2.partie .n { color: var(--accent); margin-right: 10px; }
+
+/* La carte */
+.schema, .bloc, .focus { position: relative; margin: 0; background: var(--card); border-radius: 20px; padding: 20px 22px 22px; box-shadow: var(--ombre); display: grid; gap: 10px; align-content: start; min-width: 0; }
+.etiquette, .schema::before, .piege::before, .bloc:has(table)::before, .essentiel h3 {
+  display: block; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; color: var(--accent);
+}
+.schema::before { content: "Schéma"; }
+.bloc:has(table)::before { content: "Tableau"; }
+.piege::before { content: "Piège"; color: var(--alert); }
+.page { justify-self: end; order: 99; font-size: 12px; font-weight: 700; color: var(--soft); background: var(--faint); padding: 3px 10px; border-radius: 999px; }
+h3 { font-size: 19px; font-weight: 800; letter-spacing: -0.01em; }
+.focus > h3 { color: var(--ink); }
+
+.schema > svg { display: block; width: 100%; height: auto; color: var(--ink); }
+.schema figcaption { font-size: 14.5px; color: var(--soft); }
+.legende-toggle { display: inline-flex; gap: 8px; align-items: center; font-size: 13.5px; font-weight: 700; color: var(--accent); cursor: pointer; width: fit-content; background: var(--box); padding: 6px 12px 6px 10px; border-radius: 999px; justify-self: start; }
+.legende-toggle input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
+.lbl-trou { opacity: 0; }
+.legendable:has(.legende-toggle input:checked) .lbl { opacity: 0; }
+.legendable:has(.legende-toggle input:checked) .lbl-trou { opacity: 1; }
+.lbl, .lbl-trou { transition: opacity .2s ease-out; }
+
+.focus ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+dl.chiffres { margin: 0; display: grid; gap: 14px; }
+dl.chiffres div { display: grid; gap: 2px; }
+dl.chiffres dt { font-size: 14px; color: var(--soft); order: 2; }
+dl.chiffres dd { margin: 0; font-weight: 800; font-size: 34px; line-height: 1.05; letter-spacing: -0.02em; color: var(--accent); order: 1; }
+
+/* Tableau : lignes teintées, en-tête discret */
+.table-wrap { overflow-x: auto; }
+table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 15px; }
+caption { caption-side: top; text-align: left; font-family: var(--head); font-weight: 800; font-size: 19px; letter-spacing: -0.01em; padding-bottom: 10px; }
+thead th { font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--soft); text-align: left; padding: 6px 10px 8px; border-bottom: 1px solid var(--line); }
+td, tbody th { padding: 9px 10px; text-align: left; vertical-align: top; }
+tbody th { font-weight: 800; }
+tbody tr:nth-child(odd) td, tbody tr:nth-child(odd) th { background: var(--faint); }
+tbody tr:nth-child(odd) th { border-radius: 10px 0 0 10px; }
+tbody tr:nth-child(odd) td:last-child { border-radius: 0 10px 10px 0; }
+
+/* Le piège : une carte teintée, la phrase fausse en gros, la correction sous un filet */
+.piege { background: var(--alert-soft); }
+.idee-recue { display: grid; gap: 8px; justify-items: start; }
+.idee-recue .qui { font-size: 13.5px; color: var(--soft); }
+.idee-recue q { font-size: 20px; font-weight: 800; line-height: 1.3; letter-spacing: -0.01em; quotes: "« " " »"; text-wrap: pretty; }
+.idee-recue .faux { background: var(--alert); color: var(--card); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; padding: 3px 10px; border-radius: 999px; }
+.en-realite { padding-top: 10px; border-top: 1px solid rgba(120, 60, 20, .15); font-size: 15px; }
+.en-realite b { color: var(--alert); }
+
+/* L'essentiel : la carte sombre, points numérotés en colonnes */
+.essentiel { background: var(--dark); color: var(--dark-ink); border-radius: 24px; padding: 26px 28px 28px; display: grid; gap: 16px; margin: 8px 0 0; box-shadow: var(--ombre); }
+.essentiel ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px 32px; counter-reset: c; }
+.essentiel li { counter-increment: c; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; font-size: 16px; line-height: 1.45; }
+.essentiel li::before { content: counter(c, decimal-leading-zero); font-weight: 800; color: var(--accent); font-size: 15px; padding-top: 2px; }
+
+footer.apercu { margin-top: 20px; font-size: 14px; color: var(--soft); display: grid; gap: 6px; padding: 0 4px; }
+footer.apercu h2 { font-size: 15px; color: var(--ink); font-weight: 800; }
+footer.apercu ul { margin: 0; padding-left: 18px; display: grid; gap: 2px; }
+
+/* Les autres blocs du catalogue, en cartes */
+.runin { font-weight: 800; } .runin .num { color: var(--accent); }
+.doux { color: var(--soft); font-size: 14.5px; }
+p.cat { grid-column: 1 / -1; margin: -8px 4px 0; max-width: 46em; }
+h2.partie small { text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 12px; color: var(--accent); margin-left: 8px; }
+.texte p + p { margin-top: 8px; }
+.focus .gros { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+.focus .ref, .portee { font-size: 14px; color: var(--soft); }
+.limites b { color: var(--alert); }
+dl.variables { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; }
+dl.variables div { display: flex; gap: 6px; } dl.variables dt { font-weight: 800; color: var(--accent); } dl.variables dd { margin: 0; color: var(--soft); }
+.modele { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.modele > div { background: var(--faint); border-radius: 12px; padding: 10px 12px; }
+.modele h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); font-weight: 800; }
+.modele ul { margin: 4px 0 0; padding-left: 16px; font-size: 14.5px; }
+ol.etapes { margin: 0; padding: 0; list-style: none; counter-reset: e; display: grid; gap: 10px; }
+ol.etapes li { counter-increment: e; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 4px; }
+ol.etapes li::before { content: counter(e); font-weight: 800; color: var(--accent); font-size: 24px; line-height: 1; }
+ol.frise { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+ol.frise li { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; align-items: baseline; }
+ol.frise time { font-weight: 800; color: var(--accent); font-size: 14px; }
+dl.decision { margin: 0; display: grid; gap: 8px; }
+dl.decision div { display: grid; gap: 2px; padding: 10px 12px; background: var(--faint); border-radius: 12px; }
+dl.decision dt { font-weight: 800; } dl.decision dt::before { content: "Si "; color: var(--accent); }
+dl.decision dd { margin: 0; } dl.decision dd::before { content: "→ "; color: var(--accent); font-weight: 800; }
+dl.syllogisme { margin: 0; display: grid; gap: 10px; }
+dl.syllogisme div { display: grid; gap: 2px; }
+dl.syllogisme dt { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); font-weight: 800; }
+dl.syllogisme dd { margin: 0; }
+.teste details { background: var(--faint); border-radius: 12px; padding: 10px 14px; }
+.teste summary { cursor: pointer; font-weight: 700; } .teste summary::marker { color: var(--accent); }
+.teste details p { padding-top: 6px; color: var(--soft); }
+blockquote.article { margin: 0; font-size: 19px; font-weight: 700; line-height: 1.35; letter-spacing: -0.01em; text-wrap: pretty; }
+blockquote.article::before { content: "« "; color: var(--accent); } blockquote.article::after { content: " »"; color: var(--accent); }
+pre.code { margin: 0; overflow-x: auto; background: var(--dark); color: var(--dark-ink); border-radius: 12px; padding: 12px 0; font-family: var(--code); font-size: 13.5px; line-height: 1.65; counter-reset: l; }
+pre.code span.l { display: block; counter-increment: l; white-space: pre; }
+pre.code span.l::before { content: counter(l); display: inline-block; width: 36px; padding-right: 14px; text-align: right; opacity: .5; }
+pre.code b { font-weight: 700; color: var(--accent); } pre.code i { font-style: normal; opacity: .6; }
+table.trace { font-variant-numeric: tabular-nums; }
+
+/* Catalogue des blocs : l'étiquette à gauche, la ou les cartes à droite */
+.entree { grid-column: 1 / -1; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 12px 20px; align-items: start; }
+.entree > header { display: grid; gap: 6px; padding-top: 18px; }
+.entree > header h2.partie { margin: 0; }
+.entree > header p.cat { margin: 0; }
+.entree > :not(header) { grid-column: 2; }
+.entree .cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; }
+.entree .schema { grid-column: 2; }
+@media (max-width: 760px) { .entree { grid-template-columns: minmax(0, 1fr); } .entree > :not(header), .entree .schema { grid-column: 1; } }
