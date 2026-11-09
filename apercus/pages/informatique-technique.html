@@ -1,0 +1,84 @@
+  <h2 class="partie"><span class="n">1</span>Couper en deux à chaque comparaison</h2>
+
+  <figure class="schema">
+    <svg viewBox="0 0 640 250" role="img" aria-label="Recherche de 23 dans un tableau trié de dix nombres : au tour 1 on regarde le milieu 16 et on garde la droite, au tour 2 on regarde 56 et on garde la gauche, au tour 3 on trouve 23.">
+      <g font-size="15" text-anchor="middle" style="font-family: var(--text); fill: currentColor">
+        <g font-size="14" text-anchor="start" style="fill: var(--soft)">
+          <text x="0" y="52">tour 1</text><text x="0" y="132">tour 2</text><text x="0" y="212">tour 3</text>
+        </g>
+        <g id="t1">
+          <g style="fill: var(--box)">
+            <rect x="60" y="30" width="50" height="34" rx="6"/><rect x="114" y="30" width="50" height="34" rx="6"/><rect x="168" y="30" width="50" height="34" rx="6"/><rect x="222" y="30" width="50" height="34" rx="6"/><rect x="276" y="30" width="50" height="34" rx="6" style="fill: var(--ess)"/>
+            <rect x="330" y="30" width="50" height="34" rx="6"/><rect x="384" y="30" width="50" height="34" rx="6"/><rect x="438" y="30" width="50" height="34" rx="6"/><rect x="492" y="30" width="50" height="34" rx="6"/><rect x="546" y="30" width="50" height="34" rx="6"/>
+          </g>
+          <text x="85" y="52">2</text><text x="139" y="52">5</text><text x="193" y="52">8</text><text x="247" y="52">12</text><text x="301" y="52" font-weight="700">16</text>
+          <text x="355" y="52">23</text><text x="409" y="52">38</text><text x="463" y="52">56</text><text x="517" y="52">72</text><text x="571" y="52">91</text>
+          <text x="301" y="84" font-size="13" style="fill: var(--accent)">milieu : 16 &lt; 23</text>
+        </g>
+        <g>
+          <g style="fill: var(--box)" opacity="0.35">
+            <rect x="60" y="110" width="50" height="34" rx="6"/><rect x="114" y="110" width="50" height="34" rx="6"/><rect x="168" y="110" width="50" height="34" rx="6"/><rect x="222" y="110" width="50" height="34" rx="6"/><rect x="276" y="110" width="50" height="34" rx="6"/>
+          </g>
+          <g style="fill: var(--box)">
+            <rect x="330" y="110" width="50" height="34" rx="6"/><rect x="384" y="110" width="50" height="34" rx="6"/><rect x="438" y="110" width="50" height="34" rx="6" style="fill: var(--ess)"/><rect x="492" y="110" width="50" height="34" rx="6"/><rect x="546" y="110" width="50" height="34" rx="6"/>
+          </g>
+          <g style="fill: var(--soft)"><text x="85" y="132">2</text><text x="139" y="132">5</text><text x="193" y="132">8</text><text x="247" y="132">12</text><text x="301" y="132">16</text></g>
+          <text x="355" y="132">23</text><text x="409" y="132">38</text><text x="463" y="132" font-weight="700">56</text><text x="517" y="132">72</text><text x="571" y="132">91</text>
+          <text x="463" y="164" font-size="13" style="fill: var(--accent)">milieu : 56 &gt; 23</text>
+        </g>
+        <g>
+          <g style="fill: var(--box)" opacity="0.35">
+            <rect x="60" y="190" width="50" height="34" rx="6"/><rect x="114" y="190" width="50" height="34" rx="6"/><rect x="168" y="190" width="50" height="34" rx="6"/><rect x="222" y="190" width="50" height="34" rx="6"/><rect x="276" y="190" width="50" height="34" rx="6"/>
+            <rect x="438" y="190" width="50" height="34" rx="6"/><rect x="492" y="190" width="50" height="34" rx="6"/><rect x="546" y="190" width="50" height="34" rx="6"/>
+          </g>
+          <rect x="330" y="190" width="50" height="34" rx="6" style="fill: var(--accent)"/><rect x="384" y="190" width="50" height="34" rx="6" style="fill: var(--box)"/>
+          <g style="fill: var(--soft)"><text x="85" y="212">2</text><text x="139" y="212">5</text><text x="193" y="212">8</text><text x="247" y="212">12</text><text x="301" y="212">16</text><text x="463" y="212">56</text><text x="517" y="212">72</text><text x="571" y="212">91</text></g>
+          <text x="355" y="212" font-weight="700" style="fill: var(--ground)">23</text><text x="409" y="212">38</text>
+          <text x="355" y="244" font-size="13" style="fill: var(--accent)">trouvé à l'indice 5</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption>On cherche 23 : trois comparaisons, au lieu de six en lisant le tableau dans l'ordre.</figcaption>
+  </figure>
+
+  <div class="bloc">
+    <span class="page">p. 4</span>
+<pre class="code"><span class="l"><b>fonction</b> chercher(T, x)</span><span class="l">  bas ← 0 ; haut ← longueur(T) − 1</span><span class="l">  <b>tant que</b> bas ≤ haut</span><span class="l">    milieu ← bas + (haut − bas) div 2</span><span class="l">    <b>si</b> T[milieu] = x <b>alors renvoyer</b> milieu</span><span class="l">    <b>si</b> T[milieu] &lt; x <b>alors</b> bas ← milieu + 1</span><span class="l">    <b>sinon</b> haut ← milieu − 1</span><span class="l">  <b>renvoyer</b> −1   <i>// x est absent</i></span></pre>
+  </div>
+
+  <div class="bloc">
+    <span class="page">p. 8</span>
+    <div class="table-wrap">
+      <table>
+        <caption>Séquentielle ou dichotomique</caption>
+        <thead><tr><th scope="col"></th><th scope="col">Séquentielle</th><th scope="col">Dichotomique</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Condition</th><td>aucune</td><td>tableau trié</td></tr>
+          <tr><th scope="row">Complexité</th><td>$O(n)$</td><td>$O(\log n)$</td></tr>
+          <tr><th scope="row">1 million d'éléments</th><td>jusqu'à 1 million de comparaisons</td><td>20 au plus</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="bloc focus">
+    <span class="page">p. 7</span>
+    <h3>Complexité à connaître</h3>
+    <p class="gros">Au plus $\lfloor \log_2 n \rfloor + 1$ comparaisons, soit $O(\log n)$.</p>
+    <p class="ref">Chaque tour divise l'intervalle par deux : 10 comparaisons suffisent pour 1 000 éléments.</p>
+  </div>
+
+  <div class="bloc piege">
+    <span class="page">p. 8</span>
+    <div class="idee-recue"><span class="qui">Ce qu'on entend en TP</span><q>La dichotomie marche sur n'importe quel tableau.</q><span class="faux">Faux</span></div>
+    <p class="en-realite"><b>En réalité,</b> le tableau doit être trié. Sinon l'algorithme renvoie une réponse fausse, sans aucun message d'erreur.</p>
+  </div>
+
+  <aside class="essentiel">
+    <h3>L'essentiel de cette partie</h3>
+    <ul>
+      <li>La dichotomie ne marche que sur un tableau trié.</li>
+      <li>Chaque comparaison élimine la moitié qui ne peut pas contenir la valeur.</li>
+      <li>Elle est en $O(\log n)$ : 20 comparaisons pour un million d'éléments.</li>
+    </ul>
+  </aside>

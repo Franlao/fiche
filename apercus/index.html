@@ -1,0 +1,59 @@
+<title>Aperçus des gabarits wiliyu</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@600;700;800&family=Atkinson+Hyperlegible+Next:wght@400;700&display=swap">
+<style>
+/* Mise en page : une grille de vignettes au format A4, comme une galerie de modèles ; chaque
+   vignette montre la première page de la fiche, réduite. Un clic ouvre la fiche entière. */
+:root {
+  --ground: #f4f5f7; --ink: #1b1d22; --soft: #5a606d; --page: #ffffff; --accent: #2346b8;
+  --head: "Schibsted Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+  --text: "Atkinson Hyperlegible Next", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ground: #121417; --ink: #e8e9ec; --soft: #a9aebb; --page: #1b1e23; --accent: #93a9ff; color-scheme: dark; } }
+:root[data-theme="dark"] { --ground: #121417; --ink: #e8e9ec; --soft: #a9aebb; --page: #1b1e23; --accent: #93a9ff; color-scheme: dark; }
+body { background: var(--ground); color: var(--ink); font-family: var(--text); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 64px; }
+main { max-width: 1240px; margin: 0 auto; display: grid; gap: 34px; }
+header { display: grid; gap: 10px; text-align: center; justify-items: center; }
+h1 { font-family: var(--head); font-weight: 800; font-size: clamp(30px, 4.6vw, 44px); letter-spacing: -0.02em; margin: 0; }
+header p { color: var(--soft); max-width: 40em; margin: 0; }
+.grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 30px 24px; }
+a.vignette { display: grid; gap: 10px; color: var(--ink); text-decoration: none; }
+.page { position: relative; aspect-ratio: 210 / 297; border-radius: 10px; overflow: hidden; background: var(--page);
+  box-shadow: 0 1px 2px rgba(20, 24, 32, .08), 0 8px 24px rgba(20, 24, 32, .10); transition: transform .25s cubic-bezier(.2, .8, .2, 1), box-shadow .25s; }
+a.vignette:hover .page, a.vignette:focus-visible .page { transform: translateY(-4px); box-shadow: 0 2px 4px rgba(20, 24, 32, .08), 0 16px 36px rgba(20, 24, 32, .16); }
+a.vignette:focus-visible { outline: none; }
+a.vignette:focus-visible .page { outline: 3px solid var(--accent); outline-offset: 3px; }
+.page iframe { position: absolute; top: 0; left: 0; width: 860px; height: 1216px; border: 0; transform-origin: 0 0; pointer-events: none; }
+.nom { font-family: var(--head); font-weight: 700; font-size: 17px; }
+.ex { color: var(--soft); font-size: 14.5px; margin-top: -8px; }
+@media (prefers-reduced-motion: reduce) { .page { transition: none; } }
+</style>
+
+<main>
+  <header>
+    <h1>Gabarits de fiche</h1>
+    <p>Neuf façons de présenter une fiche, une par famille de filières. Chaque famille a son dosage de schémas, de tableaux et de texte, et ses cartes d’attention. Contenus inventés ; ouvre une vignette pour voir la fiche entière.</p>
+  </header>
+  <div class="grille">
+    <a class="vignette" href="sciences-formelles.html"><div class="page"><iframe src="sciences-formelles.html" title="Aperçu Sciences formelles" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true"></iframe></div><span class="nom">Sciences formelles</span><span class="ex">Suites numériques</span></a>
+    <a class="vignette" href="vivant-sante.html"><div class="page"><iframe src="vivant-sante.html" title="Aperçu Santé et vivant" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true"></iframe></div><span class="nom">Santé et vivant</span><span class="ex">La contraction du muscle squelettique</span></a>
+    <a class="vignette" href="economie-gestion.html"><div class="page"><iframe src="economie-gestion.html" title="Aperçu Économie et gestion" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true"></iframe></div><span class="nom">Économie et gestion</span><span class="ex">Offre, demande et prix d'équilibre</span></a>
+    <a class="vignette" href="informatique-technique.html"><div class="page"><iframe src="informatique-technique.html" title="Aperçu Informatique et technique" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true"></iframe></div><span class="nom">Informatique et technique</span><span class="ex">La recherche dichotomique</span></a>
+    <a class="vignette" href="psychologie.html"><div class="page"><iframe src="psychologie.html" title="Aperçu Psychologie" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true"></iframe></div><span class="nom">Psychologie</span><span class="ex">Le conditionnement</span></a>
+    <a class="vignette" href="droit.html"><div class="page"><iframe src="droit.html" title="Aperçu Droit" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true"></iframe></div><span class="nom">Droit</span><span class="ex">La formation du contrat</span></a>
+    <a class="vignette" href="histoire.html"><div class="page"><iframe src="histoire.html" title="Aperçu Histoire et sciences sociales" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true"></iframe></div><span class="nom">Histoire et sciences sociales</span><span class="ex">1789, l'Ancien Régime s'effondre</span></a>
+    <a class="vignette" href="lettres-philosophie.html"><div class="page"><iframe src="lettres-philosophie.html" title="Aperçu Lettres et philosophie" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true"></iframe></div><span class="nom">Lettres et philosophie</span><span class="ex">La conscience</span></a>
+    <a class="vignette" href="langues.html"><div class="page"><iframe src="langues.html" title="Aperçu Langues" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true"></iframe></div><span class="nom">Langues</span><span class="ex">Present perfect ou prétérit ?</span></a>
+  </div>
+</main>
+
+<script>
+  // Réduit chaque page de 860 px de large à la largeur de sa vignette
+  const fit = () => document.querySelectorAll(".page").forEach((p) => {
+    const f = p.querySelector("iframe");
+    if (f) f.style.transform = `scale(${p.clientWidth / 860})`;
+  });
+  try { new ResizeObserver(fit).observe(document.querySelector(".grille")); } catch (e) { window.addEventListener("resize", fit); }
+  fit();
+</script>
