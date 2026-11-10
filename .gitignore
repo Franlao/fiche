@@ -17,3 +17,11 @@ htmlcov/
 
 # entrées du banc : textes de cours, regénérées par ingest
 eval/entrees/
+
+# aperçus engendrés par « uv run python apercus/build.py »
+# (sources : apercus/pages/, apercus/*.css, apercus/mises-en-page/, build.py, dessins.py)
+/apercus/*.html
+!/apercus/index.html
+/apercus/mep/
+/apercus/pages/schemas.html
+/apercus/gabarits.json
