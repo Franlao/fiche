@@ -56,16 +56,18 @@ fiche.couverture, fiche.usage, fiche.metrics
 
 Un fichier YAML par famille dans `src/fiche/familles/` : blocs permis et leur usage, ordre,
 densité, ton, consignes pour le plan et pour la rédaction. Les gabarits ne contiennent aucun
-exemple tiré d'un cours. Familles présentes : `sciences-formelles`, `vivant-sante`. À venir après
-validation sur deux cas : droit et sciences humaines, économie et gestion, informatique et
-technique.
+exemple tiré d'un cours. Gabarits écrits : `sciences-formelles`, `vivant-sante`. Les sept autres
+familles (économie et gestion, informatique et technique, psychologie, droit, histoire, lettres
+et philosophie, langues) n'existent qu'en aperçu fait main dans `apercus/pages/`.
 
 ## Visionneuse des gabarits
 
-`apercus/` contient une fiche d'aperçu écrite à la main pour chaque famille, et
+`apercus/pages/` contient une fiche d'aperçu écrite à la main pour chaque famille, et
 `visionneuse/` une application Angular pour les parcourir : la galerie, puis chaque gabarit
-avec sa fiche réelle et sa description. Après `uv run python apercus/build.py`, lancer
-`npm start` dans `visionneuse/` (détails dans `visionneuse/README.md`).
+avec sa fiche réelle et sa description. Les pages complètes, les catalogues, les mises en page
+(`apercus/*.html`, `apercus/mep/`) et `apercus/gabarits.json` sont engendrés par
+`uv run python apercus/build.py` et ne sont pas versionnés : lancer ce script après un clone,
+puis `npm start` dans `visionneuse/` (détails dans `visionneuse/README.md`).
 
 Les gabarits ont deux axes. Le **gabarit de filière** (YAML) dit quels blocs la fiche contient
 et comment on y écrit. La **mise en page** (`apercus/mises-en-page/*.css`) dit à quoi ils

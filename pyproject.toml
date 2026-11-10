@@ -1,6 +1,6 @@
 [project]
 name = "fiche"
-version = "0.1.0"
+version = "0.2.0"
 description = "Module fiche de révision pour wiliyu : d'un cours structuré par ingest à une fiche en blocs typés, selon un gabarit de filière."
 readme = "README.md"
 requires-python = ">=3.12"

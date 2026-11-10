@@ -2,6 +2,9 @@
 
 ## Non publié
 
+- Nettoyage (10 novembre 2026) : les aperçus engendrés par `apercus/build.py` ne sont plus
+  versionnés ; version du paquet alignée sur ce journal (0.2.0) ; README mis à jour sur les
+  familles réellement écrites. Retour arrière : tag `avant-nettoyage-2026-11-10`.
 - Visionneuse Angular des gabarits (`visionneuse/`) : galerie, fiche réelle à côté de la
   description du gabarit, navigation au clavier, largeur ordinateur ou téléphone, thème clair
   ou sombre.
